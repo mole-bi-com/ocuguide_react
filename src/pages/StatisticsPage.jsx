@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import UsageChart from '../components/Statistics/UsageChart';
 import UsageStats from '../components/Statistics/UsageStats';
 import UnderstandingChart from '../components/Statistics/UnderstandingChart';
-import { getPatientStats, getStepStats, getUnderstandingStats } from '../services/api';
+import { getPatientStats, getStepStats, getUnderstandingStats, getPatientProgress } from '../services/api';
 import './StatisticsPage.css';
 
 const StatisticsPage = () => {
   const [patientStats, setPatientStats] = useState(null);
   const [stepStats, setStepStats] = useState(null);
   const [understandingStats, setUnderstandingStats] = useState(null);
+  const [patientProgress, setPatientProgress] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPatient, setCurrentPatient] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -20,10 +22,12 @@ const StatisticsPage = () => {
         const patients = await getPatientStats();
         const steps = await getStepStats();
         const understanding = await getUnderstandingStats();
+        const progress = await getPatientProgress();
         
         setPatientStats(patients);
         setStepStats(steps);
         setUnderstandingStats(understanding || []);
+        setPatientProgress(progress || []);
         
         // Set current patient if available
         if (patients && patients.length > 0) {
@@ -68,42 +72,19 @@ const StatisticsPage = () => {
 
   // Process understanding level data for visualization
   const processUnderstandingData = () => {
-    if (!stepStats) return null;
+    if (!understandingStats || understandingStats.length === 0) return null;
     
-    // Create map of step names to understanding levels
-    const stepUnderstanding = {};
-    
-    stepStats.forEach(step => {
-      const stepName = step.step_name;
-      const level = step.understanding_level || 0;
-      
-      if (!stepUnderstanding[stepName]) {
-        stepUnderstanding[stepName] = {
-          totalCount: 0,
-          levels: [0, 0, 0, 0, 0] // Index 0 is unused, levels 1-4
-        };
-      }
-      
-      stepUnderstanding[stepName].totalCount++;
-      if (level > 0 && level <= 4) {
-        stepUnderstanding[stepName].levels[level]++;
-      }
-    });
-    
-    // Convert to array for visualization
-    return Object.keys(stepUnderstanding).map(stepName => {
-      const data = stepUnderstanding[stepName];
-      const highUnderstanding = data.levels[3] + data.levels[4]; // Levels 3 and 4
-      const lowUnderstanding = data.levels[1] + data.levels[2]; // Levels 1 and 2
-      const understandingRate = data.totalCount > 0 
-        ? Math.round((highUnderstanding / data.totalCount) * 100) 
-        : 0;
+    // 새로운 형식의 데이터 처리
+    return understandingStats.map(stat => {
+      // 이해도 높음 (레벨 3, 4)과 낮음(레벨 1, 2) 계산
+      const highUnderstanding = (stat.level_3_count || 0) + (stat.level_4_count || 0);
+      const lowUnderstanding = (stat.level_1_count || 0) + (stat.level_2_count || 0);
       
       return {
-        name: stepName,
+        name: stat.step_name,
         understood: highUnderstanding,
         notUnderstood: lowUnderstanding,
-        understandingRate: understandingRate
+        understandingRate: stat.understanding_rate || 0
       };
     });
   };
@@ -166,6 +147,44 @@ const StatisticsPage = () => {
       </div>
     );
   };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // 환자 데이터와 진행 상태 데이터 결합
+  const combinePatientData = () => {
+    if (!patientStats) return [];
+    
+    return patientStats.map(patient => {
+      // 해당 환자의 진행 상태 찾기
+      const progress = patientProgress.find(p => p.patient_number === patient.patient_number);
+      
+      return {
+        ...patient,
+        progress: progress || {
+          completed_steps: 0,
+          total_steps: 6,
+          completion_rate: 0,
+          current_step: '시작 전',
+          is_completed: false
+        }
+      };
+    });
+  };
+
+  // 환자 데이터 결합 및 필터링
+  const combinedPatientData = combinePatientData();
+  
+  // Filter patients based on search term
+  const filteredPatients = combinedPatientData 
+    ? combinedPatientData.filter(patient => 
+        patient.patient_number?.toString().includes(searchTerm) || 
+        patient.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        patient.primary_doctor?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <div className="statistics-page">
@@ -272,10 +291,95 @@ const StatisticsPage = () => {
               <div className="no-data-message">이해도 데이터가 없습니다.</div>
             )}
           </div>
+
+          <div className="stats-section">
+            <h2>👨‍👩‍👧‍👦 등록된 환자 목록</h2>
+            
+            <div className="stats-info-box">
+              <p>현재 시스템에 등록된 모든 환자의 목록입니다. 진행 상태 및 완료율 정보도 확인하실 수 있습니다.</p>
+            </div>
+
+            <div className="patient-list-controls">
+              <div className="search-box">
+                <input
+                  type="text"
+                  placeholder="환자 이름, 번호 또는 담당의로 검색..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="search-input"
+                />
+                <span className="search-icon">🔍</span>
+              </div>
+              <div className="patient-count">
+                총 <strong>{filteredPatients.length}</strong>명의 환자가 등록되어 있습니다.
+              </div>
+            </div>
+            
+            {filteredPatients && filteredPatients.length > 0 ? (
+              <div className="patient-list-table-container">
+                <table className="patient-list-table">
+                  <thead>
+                    <tr>
+                      <th>환자번호</th>
+                      <th>이름</th>
+                      <th>성별</th>
+                      <th>나이</th>
+                      <th>담당의사</th>
+                      <th>수술부위</th>
+                      <th>진행 상태</th>
+                      <th>완료율</th>
+                      <th>수술날짜</th>
+                      <th>등록일</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPatients.map((patient, index) => (
+                      <tr key={index} className={currentPatient && currentPatient.patient_number === patient.patient_number ? 'current-patient' : ''}>
+                        <td>{patient.patient_number}</td>
+                        <td>{patient.patient_name}</td>
+                        <td>{patient.gender}</td>
+                        <td>{patient.age}세</td>
+                        <td>{patient.primary_doctor || '-'}</td>
+                        <td>{patient.surgery_eye || '-'}</td>
+                        <td>
+                          <span className={`progress-badge ${getProgressColorClass(patient.progress.completion_rate)}`}>
+                            {patient.progress.current_step}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="progress-bar-container">
+                            <div 
+                              className="progress-bar-fill" 
+                              style={{width: `${patient.progress.completion_rate}%`}}
+                            ></div>
+                            <span className="progress-text">{patient.progress.completion_rate}%</span>
+                          </div>
+                        </td>
+                        <td>{patient.surgery_date || '-'}</td>
+                        <td>{patient.created_at ? new Date(patient.created_at).toLocaleDateString('ko-KR') : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="no-data-message">
+                {searchTerm ? '검색 결과가 없습니다.' : '등록된 환자가 없습니다.'}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
   );
+};
+
+// 진행 상태에 따른 색상 클래스 지정
+const getProgressColorClass = (completionRate) => {
+  if (completionRate === 0) return 'progress-not-started';
+  if (completionRate < 40) return 'progress-started';
+  if (completionRate < 80) return 'progress-ongoing';
+  return 'progress-completed';
 };
 
 export default StatisticsPage;

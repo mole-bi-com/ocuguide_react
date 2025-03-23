@@ -233,4 +233,169 @@
   .chart-container {
     width: 100%;
   }
+}
+
+/* Patient List Table Styles */
+.patient-list-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.search-box {
+  position: relative;
+  width: 350px;
+  max-width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.patient-count {
+  color: #666;
+  font-size: 14px;
+}
+
+.patient-list-table-container {
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 15px;
+}
+
+.patient-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.patient-list-table th,
+.patient-list-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.patient-list-table th {
+  background-color: #f8f9fa;
+  color: #555;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.patient-list-table tbody tr:hover {
+  background-color: #f5f8ff;
+}
+
+.patient-list-table tbody tr.current-patient {
+  background-color: #e6f2ff;
+}
+
+.patient-list-table tbody tr.current-patient:hover {
+  background-color: #d9ebff;
+}
+
+/* 진행 상태 배지 스타일 */
+.progress-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.progress-not-started {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.progress-started {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.progress-ongoing {
+  background-color: #fef9c3;
+  color: #ca8a04;
+}
+
+.progress-completed {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+/* 진행률 바 스타일 */
+.progress-bar-container {
+  width: 100px;
+  height: 10px;
+  background-color: #f1f5f9;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #16a34a);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  position: absolute;
+  right: -30px;
+  top: -2px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+@media (max-width: 992px) {
+  .patient-list-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .search-box {
+    width: 100%;
+  }
+  
+  .patient-count {
+    margin-top: 10px;
+  }
+  
+  .patient-list-table th,
+  .patient-list-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .progress-bar-container {
+    width: 80px;
+  }
 } 
