@@ -10,12 +10,17 @@ const HomePage = () => {
 
   // Determine which steps are completed based on progress
   useEffect(() => {
-    // Assuming there are 7 total steps based on the screenshot
+    // progress는 완료된 마지막 단계의 인덱스를 의미함
     const totalSteps = 7;
-    const completedStepCount = Math.floor((progress / 100) * totalSteps);
     
-    // Create array of completed steps
-    const stepsArray = Array.from({ length: totalSteps }, (_, i) => i < completedStepCount);
+    // -1인 경우 아직 완료된 단계가 없음
+    if (progress === -1) {
+      setCompletedSteps(Array(totalSteps).fill(false));
+      return;
+    }
+    
+    // progress 값에 따라 완료 여부 설정 (progress 이하의 인덱스는 완료됨)
+    const stepsArray = Array.from({ length: totalSteps }, (_, i) => i <= progress);
     setCompletedSteps(stepsArray);
   }, [progress]);
 

@@ -14,7 +14,10 @@ export const AppProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [progress, setProgress] = useState(0);
+  
+  // progress는 완료된 단계의 인덱스를 나타냄 (기본값은 -1, 아직 완료된 단계가 없음을 의미)
+  const [progress, setProgress] = useState(-1);
+  
   const [speechMode, setSpeechMode] = useState(false);
   const [currentSession, setCurrentSession] = useState(null);
   const [stepsTiming, setStepsTiming] = useState({});

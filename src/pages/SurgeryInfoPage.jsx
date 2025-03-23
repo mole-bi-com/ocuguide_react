@@ -152,6 +152,16 @@ const SurgeryInfoPage = () => {
     }
   ]);
 
+  // Initialize component
+  useEffect(() => {
+    // 컴포넌트 마운트 시 progress가 -1이면(초기값) 현재 단계에 맞게 조정
+    if (progress === -1) {
+      // 아직 완료된 단계가 없으므로 -1로 유지
+      // (이 상태에서는 첫 번째 단계만 접근 가능)
+      console.log('Initializing progress state');
+    }
+  }, []);
+
   // Initialize step tracking
   useEffect(() => {
     setStepStartTime(Date.now());
@@ -167,12 +177,14 @@ const SurgeryInfoPage = () => {
 
   // Set progress percentage CSS variable
   useEffect(() => {
-    const progressPercentage = steps.length > 1 ? progress / (steps.length - 1) : 0;
+    // progress는 완료된 단계의 인덱스를 나타내므로, 전체 단계수에서 계산
+    const progressPercentage = steps.length > 1 ? 
+      (progress + 1) / steps.length : 0;  // progress + 1은 완료된 단계 수
     document.documentElement.style.setProperty('--progress-percentage', progressPercentage);
   }, [progress, steps.length]);
 
   // Calculate completion percentage
-  const completionPercentage = Math.round((progress / (steps.length - 1)) * 100);
+  const completionPercentage = Math.round(((progress + 1) / steps.length) * 100);
 
   const handleUnderstandingSelect = async (level) => {
     const endTime = Date.now();
@@ -203,8 +215,11 @@ const SurgeryInfoPage = () => {
     
     // Move to next step
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-      setProgress(Math.round(((currentStep + 1) / (steps.length - 1)) * 100));
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      
+      // progress는 완료된 단계의 인덱스를 의미함
+      setProgress(currentStep);
     } else {
       // Complete the session if this is the last step
       try {
@@ -214,6 +229,9 @@ const SurgeryInfoPage = () => {
       } catch (error) {
         console.error('Failed to complete session:', error);
       }
+      
+      // 마지막 단계도 progress에 포함
+      setProgress(currentStep);
       
       // Navigate to summary page or show diagnosis
       setShowDiagnosis(true);
@@ -228,7 +246,7 @@ const SurgeryInfoPage = () => {
   const handlePrevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      setProgress(Math.round(((currentStep - 1) / (steps.length - 1)) * 100));
+      // progress는 이전 상태를 유지 (이전에 완료한 단계에 대한 정보는 변경하지 않음)
     }
   };
 
@@ -295,14 +313,16 @@ const SurgeryInfoPage = () => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`step-item ${index === currentStep ? 'active' : ''} ${index < progress ? 'completed' : 'incomplete'}`}
+            className={`step-item ${index === currentStep ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'}`}
             onClick={() => {
-              setCurrentStep(index);
-              setProgress(Math.max(progress, index));
+              // 이미 완료된 단계나 현재 진행 중인 단계+1까지만 이동 가능
+              if (index <= progress + 1) {
+                setCurrentStep(index);
+              }
             }}
           >
             <div className="step-number">
-              {index < progress ? (
+              {index <= progress ? (
                 <span className="step-completion-icon">✓</span>
               ) : (
                 index + 1
