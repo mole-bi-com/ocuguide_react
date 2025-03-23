@@ -1,0 +1,155 @@
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-section {
+  margin-bottom: 4rem;
+}
+
+.main-title {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.highlight {
+  color: #2b6cb0;
+}
+
+.intro-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.intro-text p {
+  margin-bottom: 1.5rem;
+}
+
+.features-section {
+  margin-bottom: 4rem;
+  padding: 2rem;
+  background-color: #f7fafc;
+  border-radius: 8px;
+}
+
+.features-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #2d3748;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+}
+
+.features-list li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.feature-text {
+  line-height: 1.6;
+}
+
+.cta-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 3rem;
+  background-color: #ebf8ff;
+  border-radius: 8px;
+}
+
+.cta-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.cta-button {
+  padding: 1rem 2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.cta-button.primary {
+  background-color: #2b6cb0;
+  color: white;
+}
+
+.cta-button.primary:hover {
+  background-color: #2c5282;
+}
+
+.cta-button.secondary {
+  background-color: white;
+  color: #2b6cb0;
+  border: 2px solid #2b6cb0;
+}
+
+.cta-button.secondary:hover {
+  background-color: #ebf8ff;
+}
+
+.trust-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.trust-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.trust-section p {
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.trust-section a {
+  color: #2b6cb0;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.trust-section a:hover {
+  text-decoration: underline;
+}
+
+.logos {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.hospital-logo,
+.app-logo {
+  max-height: 60px;
+  object-fit: contain;
+} 

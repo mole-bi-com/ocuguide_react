@@ -1,0 +1,111 @@
+.patient-info-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem 1rem;
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .patient-info-page {
+    padding: 1rem;
+  }
+}
+
+.page-title {
+  text-align: center;
+  color: #2d3748;
+  margin-bottom: 2rem;
+}
+
+.info-message {
+  text-align: center;
+  color: #4a5568;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.success-message {
+  text-align: center;
+  color: #2f855a;
+  margin: 2rem 0;
+  padding: 1rem;
+  background-color: #f0fff4;
+  border-radius: 8px;
+  border: 1px solid #c6f6d5;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.reset-button,
+.primary-button {
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-button {
+  background-color: white;
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+}
+
+.reset-button:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e0;
+}
+
+.primary-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+}
+
+.primary-button:hover {
+  background-color: #357abd;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4a90e2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  color: #4a5568;
+  font-size: 1.1rem;
+} 
