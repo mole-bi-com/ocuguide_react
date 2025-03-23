@@ -262,25 +262,29 @@ const SurgeryInfoPage = () => {
             className="understanding-level-btn" 
             onClick={() => handleUnderstandingSelect(1)}
           >
-            1단계<br/>이해하지 못했음
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px' }}>1단계</span>
+            <span>이해하지 못했음</span>
           </button>
           <button 
             className="understanding-level-btn" 
             onClick={() => handleUnderstandingSelect(2)}
           >
-            2단계<br/>약간 이해했음
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px' }}>2단계</span>
+            <span>약간 이해했음</span>
           </button>
           <button 
             className="understanding-level-btn" 
             onClick={() => handleUnderstandingSelect(3)}
           >
-            3단계<br/>대체로 이해했음
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px' }}>3단계</span>
+            <span>대체로 이해했음</span>
           </button>
           <button 
             className="understanding-level-btn" 
             onClick={() => handleUnderstandingSelect(4)}
           >
-            4단계<br/>완전히 이해했음
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px' }}>4단계</span>
+            <span>완전히 이해했음</span>
           </button>
         </div>
       </div>

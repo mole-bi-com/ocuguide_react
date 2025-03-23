@@ -354,12 +354,19 @@
   transition: all 0.25s ease;
   line-height: 1.5;
   min-width: 120px;
-  font-weight: 500;
+  font-weight: 600;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: #1e293b;
+}
+
+.understanding-level-btn br {
+  display: block;
+  margin: 5px 0;
+  content: "";
 }
 
 .understanding-level-btn:hover {
@@ -369,6 +376,7 @@
 
 .understanding-level-btn:nth-child(1) {
   border-left: 4px solid #f87171;
+  color: #991b1b;
 }
 .understanding-level-btn:nth-child(1):hover {
   background-color: #fee2e2;
@@ -376,6 +384,7 @@
 
 .understanding-level-btn:nth-child(2) {
   border-left: 4px solid #fb923c;
+  color: #9a3412;
 }
 .understanding-level-btn:nth-child(2):hover {
   background-color: #ffedd5;
@@ -383,6 +392,7 @@
 
 .understanding-level-btn:nth-child(3) {
   border-left: 4px solid #4ade80;
+  color: #166534;
 }
 .understanding-level-btn:nth-child(3):hover {
   background-color: #dcfce7;
@@ -390,6 +400,7 @@
 
 .understanding-level-btn:nth-child(4) {
   border-left: 4px solid #60a5fa;
+  color: #1e40af;
 }
 .understanding-level-btn:nth-child(4):hover {
   background-color: #dbeafe;
