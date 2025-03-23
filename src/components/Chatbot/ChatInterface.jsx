@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
-import MessageBubble from './MessageBubble';
+import React, { useState, useRef, useEffect } from 'react';
 import './ChatInterface.css';
 
 const ChatInterface = ({ messages, onSendMessage, isLoadingResponse }) => {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef(null);
-  
-  // Auto-scroll to the bottom when new messages arrive
-  useEffect(() => {
+  const inputRef = useRef(null);
+
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputMessage.trim() && !isLoadingResponse) {
@@ -18,48 +21,43 @@ const ChatInterface = ({ messages, onSendMessage, isLoadingResponse }) => {
       setInputMessage('');
     }
   };
-  
-  const handleInputChange = (e) => {
-    setInputMessage(e.target.value);
+
+  const renderMessageAvatar = (role) => {
+    return (
+      <div className={`message-avatar ${role}`}>
+        {role === 'assistant' ? '🤖' : '👤'}
+      </div>
+    );
   };
 
   return (
     <div className="chat-interface">
-      <div className="messages-container">
+      <div className="chat-messages">
         {messages.map((message, index) => (
-          <MessageBubble
-            key={index}
-            role={message.role}
-            content={message.content}
-          />
-        ))}
-        
-        {isLoadingResponse && (
-          <div className="loading-indicator">
-            <div className="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
+          <div key={index} className={`message ${message.role}`}>
+            {renderMessageAvatar(message.role)}
+            <div className="message-content">
+              {message.content}
             </div>
           </div>
-        )}
-        
+        ))}
         <div ref={messagesEndRef} />
       </div>
       
-      <form className="message-input-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="chat-input-container">
         <input
+          ref={inputRef}
           type="text"
           value={inputMessage}
-          onChange={handleInputChange}
-          placeholder="궁금한 사항을 물어봐주세요."
+          onChange={(e) => setInputMessage(e.target.value)}
+          placeholder="메시지를 입력하세요..."
+          className="chat-input"
           disabled={isLoadingResponse}
-          className="message-input"
         />
         <button 
           type="submit" 
-          disabled={!inputMessage.trim() || isLoadingResponse}
           className="send-button"
+          disabled={!inputMessage.trim() || isLoadingResponse}
         >
           전송
         </button>
