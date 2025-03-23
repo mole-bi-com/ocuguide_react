@@ -6,6 +6,7 @@ import StepProgress from '../components/SurgeryInfo/StepProgress';
 import InfoStep from '../components/SurgeryInfo/InfoStep';
 import DiagnosisSummary from '../components/SurgeryInfo/DiagnosisSummary';
 import CalendarSchedule from '../components/SurgeryInfo/CalendarSchedule';
+import { trackStepProgress, completeSession } from '../services/api';
 import './SurgeryInfoPage.css';
 
 const SurgeryInfoPage = () => {
@@ -15,10 +16,12 @@ const SurgeryInfoPage = () => {
     setCurrentStep, 
     progress, 
     setProgress,
+    currentSession,
     updateStepDuration 
   } = useAppContext();
   const navigate = useNavigate();
   const [stepStartTime, setStepStartTime] = useState(Date.now());
+  const [showDiagnosis, setShowDiagnosis] = useState(false);
 
   // Steps information
   const [steps] = useState([
@@ -147,6 +150,12 @@ const SurgeryInfoPage = () => {
     }
   ]);
 
+  // Initialize step tracking
+  useEffect(() => {
+    setStepStartTime(Date.now());
+  }, [currentStep]);
+
+  // Redirect if no patient info
   useEffect(() => {
     if (!patientInfo) {
       navigate('/patient-info');
@@ -154,25 +163,52 @@ const SurgeryInfoPage = () => {
     }
   }, [patientInfo, navigate]);
 
-  useEffect(() => {
-    setStepStartTime(Date.now());
-    return () => {
-      const duration = (Date.now() - stepStartTime) / 1000;
-      updateStepDuration(currentStep, duration);
-    };
-  }, [currentStep, stepStartTime, updateStepDuration]);
+  const handleNextStep = async () => {
+    const endTime = Date.now();
+    const duration = (endTime - stepStartTime) / 1000; // Convert to seconds
+    
+    // Record current step data
+    if (currentSession) {
+      const step = steps[currentStep];
+      try {
+        await trackStepProgress(currentSession, {
+          stepId: step.id,
+          stepName: step.title,
+          startTime: new Date(stepStartTime).toISOString(),
+          endTime: new Date(endTime).toISOString(),
+          durationSeconds: Math.round(duration)
+        });
+        
+        // Update local step timing
+        updateStepDuration(step.id, Math.round(duration));
+      } catch (error) {
+        console.error('Failed to track step progress:', error);
+      }
+    }
+    
+    // Move to next step
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+      setProgress(Math.round(((currentStep + 1) / (steps.length - 1)) * 100));
+    } else {
+      // Complete the session if this is the last step
+      try {
+        if (currentSession) {
+          await completeSession(currentSession);
+        }
+      } catch (error) {
+        console.error('Failed to complete session:', error);
+      }
+      
+      // Navigate to summary page or show diagnosis
+      setShowDiagnosis(true);
+    }
+  };
 
   const handlePrevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      setProgress(Math.max(progress, currentStep - 1));
-    }
-  };
-
-  const handleNextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-      setProgress(Math.max(progress, currentStep + 1));
+      setProgress(Math.round(((currentStep - 1) / (steps.length - 1)) * 100));
     }
   };
 

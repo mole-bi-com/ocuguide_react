@@ -2,14 +2,40 @@
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables
-const API_URL = process.env.REACT_APP_API_URL;
-const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
+// Environment variables with fallbacks
+const API_URL = process.env.REACT_APP_API_URL || 'https://api.example.com';
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY || '';
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || 'https://rktuabhlsbfjgvrroqxw.supabase.co';
+const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdHVhYmhsc2Jmamd2cnJvcXh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3MTczMjYsImV4cCI6MjA1ODI5MzMyNn0.4Hr0f3FvhpCjx-QWExVws7TIqsYdgEyl5MdM_T6qOlE';
+
+console.log('API Configuration:');
+console.log('- SUPABASE_URL:', SUPABASE_URL ? SUPABASE_URL.substring(0, 15) + '...' : 'undefined');
+console.log('- SUPABASE_KEY length:', SUPABASE_KEY ? SUPABASE_KEY.length : 'undefined');
 
 // Initialize Supabase client
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase;
+
+try {
+  supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log('Supabase client initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize Supabase client:', error);
+  // Fallback mock client
+  supabase = {
+    from: (table) => ({
+      select: () => Promise.resolve({ data: [], error: null }),
+      insert: () => Promise.resolve({ data: null, error: null }),
+      upsert: () => Promise.resolve({ data: null, error: null }),
+      update: () => Promise.resolve({ data: null, error: null }),
+      delete: () => Promise.resolve({ data: null, error: null }),
+      eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) })
+    }),
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null }, error: null })
+    },
+    rpc: () => Promise.resolve({ data: [], error: null })
+  };
+}
 
 // General API request function
 const apiRequest = async (method, endpoint, data = null, headers = {}) => {
@@ -27,6 +53,179 @@ const apiRequest = async (method, endpoint, data = null, headers = {}) => {
     return response.data;
   } catch (error) {
     console.error(`API request failed: ${error.message}`);
+    throw error;
+  }
+};
+
+// Patient information
+export const savePatientInfo = async (patientData) => {
+  try {
+    console.log('Saving patient data:', patientData);
+    console.log('Supabase URL:', SUPABASE_URL);
+    console.log('Supabase key length:', SUPABASE_KEY ? SUPABASE_KEY.length : 'undefined');
+    
+    // Validate required fields
+    if (!patientData.patient_number) {
+      throw new Error('환자번호는 필수입니다.');
+    }
+    
+    if (!patientData.patient_name) {
+      throw new Error('환자 이름은 필수입니다.');
+    }
+    
+    // Upsert patient data
+    console.log('Attempting to upsert patient data...');
+    const { data, error } = await supabase
+      .from('patients')
+      .upsert(
+        {
+          ...patientData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        { 
+          onConflict: 'patient_number',
+          returning: 'minimal' // 데이터 반환 최소화
+        }
+      );
+      
+    if (error) {
+      console.error('Supabase error details:', JSON.stringify(error));
+      
+      // RLS 정책 오류 처리
+      if (error.message && error.message.includes('row-level security policy')) {
+        console.error('RLS 정책 오류 - 사용자 인증 상태 확인:', await supabase.auth.getSession());
+        
+        // anonymous 사용자로 public 접근 시도
+        const { data: publicData, error: publicError } = await supabase
+          .from('patients')
+          .select('count')
+          .limit(1);
+          
+        console.log('Public 접근 테스트 결과:', publicData, publicError);
+        
+        throw new Error('데이터 저장 권한이 없습니다. 관리자에게 문의하세요.');
+      }
+      
+      throw error;
+    }
+    
+    console.log('Patient data saved successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('Error saving patient data:', error);
+    console.error('Error message:', error.message);
+    console.error('Error details:', JSON.stringify(error, null, 2));
+    throw error;
+  }
+};
+
+export const getPatientInfo = async (patientNumber) => {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('*')
+      .eq('patient_number', patientNumber)
+      .single();
+      
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching patient data:', error);
+    throw error;
+  }
+};
+
+// Session tracking
+export const startSession = async (patientNumber) => {
+  try {
+    const { data, error } = await supabase
+      .from('sessions')
+      .insert({
+        patient_number: patientNumber,
+        start_time: new Date().toISOString(),
+        is_completed: false
+      })
+      .select();
+      
+    if (error) throw error;
+    return data?.[0]?.id;
+  } catch (error) {
+    console.error('Error starting session:', error);
+    throw error;
+  }
+};
+
+export const completeSession = async (sessionId) => {
+  try {
+    const { error } = await supabase
+      .from('sessions')
+      .update({
+        end_time: new Date().toISOString(),
+        is_completed: true
+      })
+      .eq('id', sessionId);
+      
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error completing session:', error);
+    throw error;
+  }
+};
+
+// Step tracking
+export const trackStepProgress = async (sessionId, stepData) => {
+  try {
+    const { error } = await supabase
+      .from('steps')
+      .insert({
+        session_id: sessionId,
+        step_id: stepData.stepId,
+        step_name: stepData.stepName,
+        start_time: stepData.startTime,
+        end_time: stepData.endTime,
+        duration_seconds: stepData.durationSeconds
+      });
+      
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error tracking step progress:', error);
+    throw error;
+  }
+};
+
+// Statistics
+export const getPatientStats = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('*');
+      
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching patient statistics:', error);
+    throw error;
+  }
+};
+
+export const getStepStats = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('steps')
+      .select(`
+        *,
+        sessions:session_id (
+          patient_number
+        )
+      `);
+      
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching step statistics:', error);
     throw error;
   }
 };
@@ -241,5 +440,12 @@ export default {
   getDiagnosisDraft,
   sendChatMessage,
   textToSpeech,
-  speechToText
+  speechToText,
+  savePatientInfo,
+  getPatientInfo,
+  startSession,
+  completeSession,
+  trackStepProgress,
+  getPatientStats,
+  getStepStats
 };

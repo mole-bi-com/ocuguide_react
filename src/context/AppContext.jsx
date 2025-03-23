@@ -15,13 +15,14 @@ export const AppProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [stepDurations, setStepDurations] = useState({});
   const [speechMode, setSpeechMode] = useState(false);
+  const [currentSession, setCurrentSession] = useState(null);
+  const [stepsTiming, setStepsTiming] = useState({});
 
   const updateStepDuration = (stepId, duration) => {
-    setStepDurations(prev => ({
+    setStepsTiming(prev => ({
       ...prev,
-      [stepId]: (prev[stepId] || 0) + duration
+      [stepId]: duration
     }));
   };
 
@@ -38,10 +39,12 @@ export const AppProvider = ({ children }) => {
     setCurrentStep,
     progress,
     setProgress,
-    stepDurations,
-    updateStepDuration,
     speechMode,
-    toggleSpeechMode
+    setSpeechMode,
+    currentSession,
+    setCurrentSession,
+    stepsTiming,
+    updateStepDuration
   };
 
   return (
@@ -49,4 +52,6 @@ export const AppProvider = ({ children }) => {
       {children}
     </AppContext.Provider>
   );
-}; 
+};
+
+export default AppProvider; 

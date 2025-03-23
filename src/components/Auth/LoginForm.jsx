@@ -1,5 +1,5 @@
 // src/components/Auth/LoginForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import './LoginForm.css';
@@ -11,20 +11,32 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    console.log('LoginForm component rendered');
+    document.title = 'OcuGUIDE - 로그인';
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    console.log('Login attempt with:', { username, password });
 
     if (!username || !password) {
       setError('아이디와 비밀번호를 모두 입력해주세요.');
       return;
     }
 
-    const result = await login(username, password);
-    if (result.success) {
-      navigate('/home');
-    } else {
-      setError(result.error);
+    try {
+      const result = await login(username, password);
+      console.log('Login result:', result);
+      if (result.success) {
+        navigate('/home');
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('로그인 중 오류가 발생했습니다.');
     }
   };
 
@@ -65,6 +77,10 @@ const LoginForm = () => {
             {isLoading ? '로그인 중...' : '로그인'}
           </button>
         </form>
+        
+        <div className="login-footer">
+          <p>테스트 계정: doc / 1</p>
+        </div>
       </div>
     </div>
   );
