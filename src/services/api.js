@@ -185,7 +185,8 @@ export const trackStepProgress = async (sessionId, stepData) => {
         step_name: stepData.stepName,
         start_time: stepData.startTime,
         end_time: stepData.endTime,
-        duration_seconds: stepData.durationSeconds
+        duration_seconds: stepData.durationSeconds,
+        understanding_level: stepData.understandingLevel || 0
       });
       
     if (error) throw error;
@@ -226,6 +227,20 @@ export const getStepStats = async () => {
     return data;
   } catch (error) {
     console.error('Error fetching step statistics:', error);
+    throw error;
+  }
+};
+
+// Get understanding level statistics
+export const getUnderstandingStats = async () => {
+  try {
+    const { data, error } = await supabase
+      .rpc('get_understanding_level_stats');
+      
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching understanding statistics:', error);
     throw error;
   }
 };
@@ -447,5 +462,6 @@ export default {
   completeSession,
   trackStepProgress,
   getPatientStats,
-  getStepStats
+  getStepStats,
+  getUnderstandingStats
 };

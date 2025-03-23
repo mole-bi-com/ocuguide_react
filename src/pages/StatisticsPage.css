@@ -128,4 +128,109 @@
   .page-title {
     font-size: 1.5rem;
   }
+}
+
+/* Understanding level visualization */
+.understanding-bars {
+  margin-top: 20px;
+}
+
+.understanding-bar-item {
+  margin-bottom: 24px;
+}
+
+.bar-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.bar-container {
+  width: 100%;
+}
+
+.bar-wrapper {
+  background-color: #f1f1f1;
+  border-radius: 6px;
+  height: 26px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.bar-fill.understood {
+  background-color: #4ade80;
+}
+
+.bar-fill.not-understood {
+  background-color: #f87171;
+}
+
+.bar-percentage {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.understanding-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.understood-legend {
+  color: #15803d;
+}
+
+.not-understood-legend {
+  color: #b91c1c;
+}
+
+/* Understanding Charts */
+.understanding-charts {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.chart-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.chart-container {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .chart-row {
+    flex-direction: column;
+  }
+  
+  .chart-container {
+    width: 100%;
+  }
 } 

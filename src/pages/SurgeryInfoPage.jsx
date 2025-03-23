@@ -22,6 +22,8 @@ const SurgeryInfoPage = () => {
   const navigate = useNavigate();
   const [stepStartTime, setStepStartTime] = useState(Date.now());
   const [showDiagnosis, setShowDiagnosis] = useState(false);
+  const [showUnderstandingPrompt, setShowUnderstandingPrompt] = useState(false);
+  const [understandingLevel, setUnderstandingLevel] = useState(0);
 
   // Steps information
   const [steps] = useState([
@@ -163,11 +165,20 @@ const SurgeryInfoPage = () => {
     }
   }, [patientInfo, navigate]);
 
-  const handleNextStep = async () => {
+  // Set progress percentage CSS variable
+  useEffect(() => {
+    const progressPercentage = steps.length > 1 ? progress / (steps.length - 1) : 0;
+    document.documentElement.style.setProperty('--progress-percentage', progressPercentage);
+  }, [progress, steps.length]);
+
+  // Calculate completion percentage
+  const completionPercentage = Math.round((progress / (steps.length - 1)) * 100);
+
+  const handleUnderstandingSelect = async (level) => {
     const endTime = Date.now();
     const duration = (endTime - stepStartTime) / 1000; // Convert to seconds
     
-    // Record current step data
+    // Record current step data with understanding level
     if (currentSession) {
       const step = steps[currentStep];
       try {
@@ -176,7 +187,8 @@ const SurgeryInfoPage = () => {
           stepName: step.title,
           startTime: new Date(stepStartTime).toISOString(),
           endTime: new Date(endTime).toISOString(),
-          durationSeconds: Math.round(duration)
+          durationSeconds: Math.round(duration),
+          understandingLevel: level
         });
         
         // Update local step timing
@@ -185,6 +197,9 @@ const SurgeryInfoPage = () => {
         console.error('Failed to track step progress:', error);
       }
     }
+
+    // Hide understanding prompt
+    setShowUnderstandingPrompt(false);
     
     // Move to next step
     if (currentStep < steps.length - 1) {
@@ -205,12 +220,54 @@ const SurgeryInfoPage = () => {
     }
   };
 
+  const handleNextStep = () => {
+    // Show understanding prompt
+    setShowUnderstandingPrompt(true);
+  };
+
   const handlePrevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       setProgress(Math.round(((currentStep - 1) / (steps.length - 1)) * 100));
     }
   };
+
+  // New Understanding Level Component
+  const UnderstandingLevelPrompt = () => (
+    <div className="understanding-prompt-overlay">
+      <div className="understanding-prompt">
+        <h3>이 단계의 내용을 얼마나 이해하셨나요?</h3>
+        <p>선택한 단계에서 환자의 이해도를 알려주세요</p>
+        
+        <div className="understanding-levels">
+          <button 
+            className="understanding-level-btn" 
+            onClick={() => handleUnderstandingSelect(1)}
+          >
+            1단계<br/>이해하지 못했음
+          </button>
+          <button 
+            className="understanding-level-btn" 
+            onClick={() => handleUnderstandingSelect(2)}
+          >
+            2단계<br/>약간 이해했음
+          </button>
+          <button 
+            className="understanding-level-btn" 
+            onClick={() => handleUnderstandingSelect(3)}
+          >
+            3단계<br/>대체로 이해했음
+          </button>
+          <button 
+            className="understanding-level-btn" 
+            onClick={() => handleUnderstandingSelect(4)}
+          >
+            4단계<br/>완전히 이해했음
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   if (!patientInfo) {
     return null;
@@ -220,18 +277,41 @@ const SurgeryInfoPage = () => {
     <div className="surgery-info-page">
       <h1 className="page-title">🏥 백내장 수술 정보</h1>
       
+      <div className="progress-overview">
+        <div className="progress-bar-container">
+          <div className="progress-bar-label">
+            <span>진행 상태: {completionPercentage}% 완료</span>
+          </div>
+          <div className="progress-bar">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${completionPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+      </div>
+      
       <div className="step-progress">
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`step-item ${index === currentStep ? 'active' : ''} ${index <= progress ? 'completed' : ''}`}
+            className={`step-item ${index === currentStep ? 'active' : ''} ${index < progress ? 'completed' : 'incomplete'}`}
             onClick={() => {
               setCurrentStep(index);
               setProgress(Math.max(progress, index));
             }}
           >
-            <div className="step-number">{step.id + 1}</div>
+            <div className="step-number">
+              {index < progress ? (
+                <span className="step-completion-icon">✓</span>
+              ) : (
+                index + 1
+              )}
+            </div>
             <div className="step-title">{step.title}</div>
+            {index === currentStep && (
+              <div className="current-step-indicator"></div>
+            )}
           </div>
         ))}
       </div>
@@ -266,6 +346,8 @@ const SurgeryInfoPage = () => {
           <CalendarSchedule patientInfo={patientInfo} />
         </div>
       )}
+
+      {showUnderstandingPrompt && <UnderstandingLevelPrompt />}
     </div>
   );
 };

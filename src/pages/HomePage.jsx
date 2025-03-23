@@ -1,9 +1,24 @@
 // src/pages/HomePage.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 import './HomePage.css';
 
 const HomePage = () => {
+  const { progress } = useAppContext();
+  const [completedSteps, setCompletedSteps] = useState([]);
+
+  // Determine which steps are completed based on progress
+  useEffect(() => {
+    // Assuming there are 7 total steps based on the screenshot
+    const totalSteps = 7;
+    const completedStepCount = Math.floor((progress / 100) * totalSteps);
+    
+    // Create array of completed steps
+    const stepsArray = Array.from({ length: totalSteps }, (_, i) => i < completedStepCount);
+    setCompletedSteps(stepsArray);
+  }, [progress]);
+
   return (
     <div className="home-page">
       <div className="hero-section">
@@ -18,6 +33,67 @@ const HomePage = () => {
           <p>
             이곳에서 제공하는 자료와 맞춤형 정보로 백내장 수술을 준비하고, 궁금한 사항에 대해 자유롭게 문의하세요.
           </p>
+        </div>
+      </div>
+      
+      <div className="surgery-steps-section">
+        <h2>백내장 수술 정보</h2>
+        <div className="steps-grid">
+          <Link to="/surgery-info" className={`step-card ${completedSteps[0] ? 'completed' : ''}`}>
+            <div className="step-number">1</div>
+            <div className="step-content">
+              <h3>정보 개요</h3>
+              {completedSteps[0] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
+          
+          <Link to="/surgery-info" className={`step-card ${completedSteps[1] ? 'completed' : ''}`}>
+            <div className="step-number">2</div>
+            <div className="step-content">
+              <h3>백내장의 정의, 수술 과정</h3>
+              {completedSteps[1] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
+          
+          <Link to="/surgery-info" className={`step-card ${completedSteps[2] ? 'completed' : ''}`}>
+            <div className="step-number">3</div>
+            <div className="step-content">
+              <h3>인공수정체 결정</h3>
+              {completedSteps[2] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
+          
+          <Link to="/surgery-info" className={`step-card ${completedSteps[3] ? 'completed' : ''}`}>
+            <div className="step-number">4</div>
+            <div className="step-content">
+              <h3>백내장 수술 후 시력, 일상생활</h3>
+              {completedSteps[3] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
+          
+          <Link to="/surgery-info" className={`step-card ${completedSteps[4] ? 'completed' : ''}`}>
+            <div className="step-number">5</div>
+            <div className="step-content">
+              <h3>백내장 수술의 합병증과 부작용</h3>
+              {completedSteps[4] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
+          
+          <Link to="/surgery-info" className={`step-card ${completedSteps[5] ? 'completed' : ''}`}>
+            <div className="step-number">6</div>
+            <div className="step-content">
+              <h3>빈번한 질문 리스트</h3>
+              {completedSteps[5] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
+          
+          <Link to="/surgery-info" className={`step-card ${completedSteps[6] ? 'completed' : ''}`}>
+            <div className="step-number">7</div>
+            <div className="step-content">
+              <h3>수술 후 주의사항</h3>
+              {completedSteps[6] && <div className="step-completed-badge">✓ 완료</div>}
+            </div>
+          </Link>
         </div>
       </div>
       
