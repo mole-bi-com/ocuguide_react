@@ -15,8 +15,16 @@ const ChatbotPage = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioPlayer = useRef(null);
 
+  const quickQuestionsData = {
+    '백내장 수술은 얼마나 걸리나요?': '백내장 수술은 보통 15-20분 정도 소요됩니다. 하지만 수술 전 준비와 수술 후 회복 시간을 포함하면 병원에서 약 2-3시간 정도 머무르게 됩니다.',
+    '수술 후 일상생활은 언제부터 가능한가요?': '대부분의 환자는 수술 다음 날부터 일상적인 활동이 가능합니다. 다만, 격렬한 운동이나 수영 등은 의사와 상담 후 결정하시는 것이 좋습니다.',
+    '수술 후 주의사항은 무엇인가요?': '1. 눈을 비비거나 만지지 않기\n2. 처방된 안약 정시에 점안하기\n3. 먼지가 많은 곳 피하기\n4. 수영장, 사우나 등은 2-3주간 피하기\n5. 정기적인 경과 관찰 꼭 받기',
+    '백내장 수술 비용은 얼마인가요?': '백내장 수술 비용은 보험 적용 시 본인부담금이 약 20-30만원 정도입니다. 다만, 고급 렌즈 선택 시 추가 비용이 발생할 수 있으며, 이는 의료진과 상담 후 결정하시면 됩니다.',
+    '수술 후 회복기간은 얼마나 되나요?': '일반적으로 수술 후 1-2주 정도면 일상생활이 가능한 수준으로 회복됩니다. 완전한 회복은 1-2개월 정도 소요되며, 이 기간 동안 정기적인 경과 관찰이 필요합니다.',
+    '양쪽 눈을 동시에 수술할 수 있나요?': '일반적으로는 한쪽 눈을 수술하고 회복을 지켜본 후 반대쪽 눈을 수술합니다. 하지만 환자의 상태와 의료진의 판단에 따라 양안 동시 수술도 가능할 수 있습니다.'
+  };
+
   useEffect(() => {
-    // Initialize chat with welcome message
     if (messages.length === 0) {
       setMessages([
         {
@@ -30,39 +38,30 @@ const ChatbotPage = () => {
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
 
-    const newUserMessage = {
-      role: 'user',
-      content: message
-    };
-
-    setMessages(prev => [...prev, newUserMessage]);
+    // Add user message
+    setMessages(prev => [...prev, { role: 'user', content: message }]);
     setIsLoadingResponse(true);
 
     try {
-      const response = await sendChatMessage(newUserMessage.content, messages);
-      
-      const newAssistantMessage = {
-        role: 'assistant',
-        content: response
-      };
+      // Add assistant message
+      const response = quickQuestionsData[message] || await sendChatMessage(message);
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
 
-      setMessages(prev => [...prev, newAssistantMessage]);
-
-      // If speech mode is enabled, convert response to speech
       if (speechMode) {
-        setIsSpeaking(true);
         const audioUrl = await textToSpeech(response);
-        audioPlayer.current.src = audioUrl;
-        audioPlayer.current.play();
+        if (audioPlayer.current) {
+          audioPlayer.current.src = audioUrl;
+          audioPlayer.current.play();
+          setIsSpeaking(true);
+        }
       }
     } catch (error) {
-      console.error('Error sending message to chatbot:', error);
-      
+      console.error('Error sending message:', error);
       setMessages(prev => [
-        ...prev, 
+        ...prev,
         {
           role: 'assistant',
-          content: '죄송합니다. 메시지 전송 중 오류가 발생했습니다. 다시 시도해 주세요.'
+          content: '죄송합니다. 오류가 발생했습니다. 다시 시도해 주세요.'
         }
       ]);
     } finally {
@@ -70,61 +69,29 @@ const ChatbotPage = () => {
     }
   };
 
-  const handleQuickQuestionSelect = (question, answer) => {
-    // Add user question to messages
-    setMessages(prev => [
-      ...prev,
-      {
-        role: 'user',
-        content: question
-      }
-    ]);
-
-    // Add pre-defined answer
-    setTimeout(() => {
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: answer
-        }
-      ]);
-
-      // If speech mode is enabled, read the answer
-      if (speechMode) {
-        setIsSpeaking(true);
-        textToSpeech(answer).then(audioUrl => {
-          audioPlayer.current.src = audioUrl;
-          audioPlayer.current.play();
-        });
-      }
-    }, 500);
+  const handleQuickQuestionSelect = (question) => {
+    handleSendMessage(question);
   };
 
   const handleAudioRecorded = async (audioBlob) => {
     try {
       setIsLoadingResponse(true);
-      
-      // Convert speech to text
       const transcription = await speechToText(audioBlob);
       
       if (transcription) {
-        // Add transcription as user message
         handleSendMessage(transcription);
       } else {
         throw new Error('Failed to transcribe audio');
       }
     } catch (error) {
       console.error('Error processing audio:', error);
-      
       setMessages(prev => [
-        ...prev, 
+        ...prev,
         {
           role: 'assistant',
           content: '죄송합니다. 음성 처리 중 오류가 발생했습니다. 다시 시도해 주세요.'
         }
       ]);
-      
       setIsLoadingResponse(false);
     }
   };
