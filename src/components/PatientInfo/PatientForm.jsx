@@ -1,5 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PatientForm.css';
+
+// 소견 분류 상세 내용 (파이썬 코드 참고)
+const diagnosisCategories = {
+  '전안부': ["안검염(마이봄샘 기능장애 포함)", "건성안"],
+  '각막': ["내피세포 이상 1200개 미만", "내피세포 이상 1200~1500개", "각막혼탁","기타각막질환"],
+  '전방': ["얕은 전방", "산동 저하", "소대 이상", "급성폐쇄각녹내장", "거짓비늘증후군", "외상"],
+  '수정체': ["심한 백내장(백색, 갈색, 후낭하혼탁 포함)", "안저검사 불가"],
+  '망막': ["망막질환 (황반변성, 당뇨망막병증 등)"],
+  '시신경': ["녹내장", "뇌병변으로 인한 시야장애"]
+};
 
 const PatientForm = ({ onSubmit, setIsLoading }) => {
   const [formData, setFormData] = useState({
@@ -19,8 +29,18 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
     emergencyPhone: '',
     medicalHistory: '',
     allergies: '',
-    medications: ''
+    medications: '',
+    diagnosis: {} // diagnosis 필드 초기화
   });
+
+  // diagnosis 상태 초기화
+  useEffect(() => {
+    const initialDiagnosis = {};
+    Object.keys(diagnosisCategories).forEach(category => {
+      initialDiagnosis[category] = [];
+    });
+    setFormData(prev => ({ ...prev, diagnosis: initialDiagnosis }));
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
 
   const [errors, setErrors] = useState({});
 
@@ -102,12 +122,37 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
     }
   };
 
+  // 소견 정보 체크박스 변경 핸들러
+  const handleDiagnosisChange = (e) => {
+    const { name: category, value: item, checked } = e.target;
+    setFormData(prev => {
+      const currentCategoryItems = prev.diagnosis[category] || [];
+      let updatedCategoryItems;
+      if (checked) {
+        // 항목 추가
+        updatedCategoryItems = [...currentCategoryItems, item];
+      } else {
+        // 항목 제거
+        updatedCategoryItems = currentCategoryItems.filter(i => i !== item);
+      }
+      return {
+        ...prev,
+        diagnosis: {
+          ...prev.diagnosis,
+          [category]: updatedCategoryItems
+        }
+      };
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
       setIsLoading(true);
       try {
         if (typeof onSubmit === 'function') {
+          // 제출 시 diagnosis 데이터 포함
+          console.log("Submitting form data including diagnosis:", formData);
           onSubmit(formData);
         } else {
           console.error('onSubmit is not a function');
@@ -388,6 +433,29 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
             rows="2"
           />
         </div>
+      </div>
+
+      <div className="form-section diagnosis-section">
+        <h3>소견 정보</h3>
+        {Object.entries(diagnosisCategories).map(([category, items]) => (
+          <div key={category} className="diagnosis-category">
+            <h4>{category}</h4>
+            <div className="checkbox-group">
+              {items.map((item, index) => (
+                <label key={`${category}-${index}`}>
+                  <input
+                    type="checkbox"
+                    name={category} // 카테고리 이름을 name으로 사용
+                    value={item}   // 항목 값을 value로 사용
+                    checked={formData.diagnosis[category]?.includes(item) || false}
+                    onChange={handleDiagnosisChange}
+                  />
+                  {item}
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="form-actions">

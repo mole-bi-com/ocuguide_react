@@ -181,9 +181,118 @@ export const createRequiredTables = async () => {
   }
 };
 
+// 테이블 리스트 가져오기
+export const getTablesList = async () => {
+  try {
+    const { data, error } = await supabase.rpc('list_tables');
+    
+    if (error) {
+      console.error('테이블 목록 조회 실패:', error);
+      
+      // 대체 방법: patients 테이블 구조 확인
+      const { data: tableData, error: tableError } = await supabase
+        .from('patients')
+        .select('*')
+        .limit(1);
+        
+      if (!tableError) {
+        return { success: true, tables: ['patients 테이블 확인됨'], structure: tableData && tableData.length > 0 ? Object.keys(tableData[0]) : [] };
+      }
+      
+      // sessions 테이블 확인
+      const { data: sessionsData, error: sessionsError } = await supabase
+        .from('sessions')
+        .select('*')
+        .limit(1);
+        
+      if (!sessionsError) {
+        return { success: true, tables: ['sessions 테이블 확인됨'], structure: sessionsData && sessionsData.length > 0 ? Object.keys(sessionsData[0]) : [] };
+      }
+      
+      // steps 테이블 확인
+      const { data: stepsData, error: stepsError } = await supabase
+        .from('steps')
+        .select('*')
+        .limit(1);
+        
+      if (!stepsError) {
+        return { success: true, tables: ['steps 테이블 확인됨'], structure: stepsData && stepsData.length > 0 ? Object.keys(stepsData[0]) : [] };
+      }
+      
+      return { success: false, message: error.message };
+    }
+    
+    return { success: true, tables: data };
+  } catch (error) {
+    console.error('Supabase 연결 오류:', error);
+    return { success: false, message: error.message };
+  }
+};
+
+// 테이블 구조 가져오기
+export const getTableStructure = async (tableName) => {
+  try {
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('*')
+      .limit(1);
+    
+    if (error) {
+      return { success: false, message: error.message };
+    }
+    
+    // 첫 번째 레코드의 키를 통해 테이블 구조 파악
+    const structure = data && data.length > 0 ? Object.keys(data[0]) : [];
+    
+    return { success: true, structure };
+  } catch (error) {
+    console.error(`${tableName} 테이블 구조 조회 오류:`, error);
+    return { success: false, message: error.message };
+  }
+};
+
+// Supabase 연결 테스트
+export const testSupabaseConnection = async () => {
+  try {
+    // 간단한 쿼리 실행
+    const { data, error } = await supabase
+      .from('patients')
+      .select('count')
+      .limit(1);
+    
+    if (error) {
+      // 다른 테이블 시도
+      const { error: sessionsError } = await supabase
+        .from('sessions')
+        .select('count')
+        .limit(1);
+      
+      if (sessionsError) {
+        // 또 다른 테이블 시도
+        const { error: stepsError } = await supabase
+          .from('steps')
+          .select('count')
+          .limit(1);
+        
+        if (stepsError) {
+          return { success: false, message: '연결은 성공했으나 모든 테이블에 접근할 수 없습니다.' };
+        }
+      }
+    }
+    
+    return { success: true, message: 'Supabase 연결 성공!' };
+  } catch (error) {
+    console.error('Supabase 연결 테스트 오류:', error);
+    return { success: false, message: error.message };
+  }
+};
+
 export default {
   testConnection,
   checkTableStructure,
   listAllTables,
-  createRequiredTables
+  createRequiredTables,
+  getTablesList,
+  getTableStructure,
+  testSupabaseConnection
 }; 

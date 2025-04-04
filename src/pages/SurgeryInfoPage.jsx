@@ -302,7 +302,7 @@ const SurgeryInfoPage = () => {
       <div className="progress-overview">
         <div className="progress-bar-container">
           <div className="progress-bar-label">
-            <span>진행 상태: {completionPercentage}% 완료</span>
+            <span>진행 상태: <strong>{completionPercentage}%</strong> 완료</span>
           </div>
           <div className="progress-bar">
             <div 

@@ -186,36 +186,6 @@ const StatisticsPage = () => {
       )
     : [];
 
-  // 진행 상태에 따른 색상 클래스 지정
-  const getProgressColorClass = (completionRate) => {
-    if (completionRate === 0) return 'progress-not-started';
-    if (completionRate < 40) return 'progress-started';
-    if (completionRate < 80) return 'progress-ongoing';
-    return 'progress-completed';
-  };
-
-  // 진행 상태에 따른 더 자세한 설명 생성
-  const getProgressDescription = (progress) => {
-    if (!progress) return { stage: '시작 전', desc: '아직 시작하지 않았습니다' };
-    
-    const { current_step, completion_rate } = progress;
-    
-    if (completion_rate === 0) {
-      return { stage: '시작 전', desc: '아직 시작하지 않았습니다' };
-    }
-    
-    if (completion_rate === 100) {
-      return { stage: '완료', desc: '모든 단계를 완료했습니다' };
-    }
-    
-    if (current_step.includes('단계 진행 중')) {
-      const step = current_step.replace('단계 진행 중', '').trim();
-      return { stage: `${step}단계`, desc: `${step}단계 진행 중입니다` };
-    }
-    
-    return { stage: current_step, desc: '진행 중입니다' };
-  };
-
   return (
     <div className="statistics-page">
       <h1 className="page-title">✨ OcuGUIDE 사용내역</h1>
@@ -371,25 +341,20 @@ const StatisticsPage = () => {
                         <td>{patient.age}세</td>
                         <td>{patient.primary_doctor || '-'}</td>
                         <td>{patient.surgery_eye || '-'}</td>
-                        <td>
-                          <div className="status-cell">
-                            <span 
-                              className={`progress-badge ${getProgressColorClass(patient.progress.completion_rate)}`}
-                              title={getProgressDescription(patient.progress).desc}
-                            >
-                              {getProgressDescription(patient.progress).stage}
+                        <td className="status-cell">
+                          <div title={`현재 단계: ${patient.progress.current_step}`}>
+                            <span className={`progress-badge ${getProgressColorClass(patient.progress.completion_rate)}`}>
+                              {getProgressDescription(patient.progress)}
                             </span>
                           </div>
                         </td>
-                        <td>
-                          <div className="progress-cell">
-                            <div className="progress-bar-container">
-                              <div 
-                                className="progress-bar-fill" 
-                                style={{width: `${patient.progress.completion_rate}%`}}
-                              ></div>
-                              <span className="progress-text">{patient.progress.completion_rate}%</span>
-                            </div>
+                        <td className="progress-cell">
+                          <div className="progress-bar-container">
+                            <div 
+                              className="progress-bar-fill" 
+                              style={{width: `${patient.progress.completion_rate}%`}}
+                            ></div>
+                            <span className="progress-text">{patient.progress.completion_rate}%</span>
                           </div>
                         </td>
                         <td>{patient.surgery_date || '-'}</td>
@@ -409,6 +374,24 @@ const StatisticsPage = () => {
       )}
     </div>
   );
+};
+
+// 진행 상태에 따른 색상 클래스 지정
+const getProgressColorClass = (completionRate) => {
+  if (completionRate === 0) return 'progress-not-started';
+  if (completionRate < 40) return 'progress-started';
+  if (completionRate < 80) return 'progress-ongoing';
+  return 'progress-completed';
+};
+
+// 진행 상태에 따른 설명 텍스트 반환
+const getProgressDescription = (progress) => {
+  const { completion_rate, current_step } = progress;
+  
+  if (completion_rate === 0) return '⏳ 시작 전';
+  if (completion_rate < 40) return `🚀 ${current_step}`;
+  if (completion_rate < 80) return `🔄 ${current_step}`;
+  return '✅ 완료됨';
 };
 
 export default StatisticsPage;
