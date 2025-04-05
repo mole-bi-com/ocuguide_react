@@ -648,6 +648,21 @@
   margin-bottom: 0.5rem;
 }
 
+/* ReactMarkdown에서 생성될 수 있는 h 태그에 대한 기본 스타일 추가 (선택적) */
+.ai-prep-content h1,
+.ai-prep-content h2,
+.ai-prep-content h3,
+.ai-prep-content h4,
+.ai-prep-content h5,
+.ai-prep-content h6 {
+  font-size: 1.1rem; /* 제목 폰트 크기 */
+  font-weight: 600; /* 폰트 두께 */
+  color: #1e3a8a; /* 제목 색상 */
+  margin-bottom: 1rem; /* 제목 아래 여백 */
+  padding-bottom: 0.5rem; /* 제목 아래 밑줄 공간 */
+  border-bottom: 1px solid #e0e7ff; /* 연한 밑줄 */
+}
+
 /* 첫 번째 단계 진단 요약 섹션 스타일 (유지) */
 .initial-diagnosis-section {
     margin-top: 20px;

@@ -21,23 +21,24 @@ const formatDate = (date) => {
   }
 };
 
-// AI 소견에서 "수술 준비 및 주의사항" 부분만 추출하는 헬퍼 함수
+// AI 소견에서 "수술 준비 사항" 관련 부분만 추출하는 헬퍼 함수 수정
 const getPreparationText = (fullExplanation) => {
   if (!fullExplanation) {
     return 'AI 소견 정보를 불러오는 중입니다...';
   }
-  // "수술 준비 및 주의사항"을 기준으로 텍스트 분리 시작
-  const marker = '수술 준비 및 주의사항';
+  // "수술 준비 사항"을 기준으로 텍스트 분리 시작
+  const marker = '수술 준비 사항'; // 사용자가 제안한 마커 사용
   const startIndex = fullExplanation.indexOf(marker);
-  
+
   if (startIndex === -1) {
-    // 해당 문구를 찾지 못한 경우, 사용자에게 알림
-    console.warn("Marker '수술 준비 및 주의사항' not found in AI explanation.");
-    return '수술 준비 및 주의사항 정보를 찾을 수 없습니다.'; 
+    // 해당 문구를 찾지 못한 경우, 콘솔 경고 및 사용자 알림
+    console.warn(`Marker '${marker}' not found in AI explanation.`);
+    return '수술 준비 사항 섹션을 찾을 수 없습니다. AI 응답 형식을 확인해주세요.'; 
   }
-  
-  // 해당 문구부터 끝까지의 텍스트 반환
-  return fullExplanation.substring(startIndex);
+
+  // 마커("수술 준비 사항")를 포함하여 이후의 텍스트를 반환
+  // (이제 추출된 텍스트 자체에 제목이 포함됨)
+  return fullExplanation.substring(startIndex); 
 };
 
 const SurgeryInfoPage = () => {
