@@ -194,11 +194,13 @@
 }
 
 .calendar-section {
-  margin-top: 40px;
+  margin-top: 0;
   padding: 30px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+  border-bottom: 1px solid #eef2f7;
 }
 
 @media (max-width: 768px) {
@@ -564,4 +566,89 @@
 .nav-button:not(:disabled):hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.surgery-schedule {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.schedule-list {
+  list-style: none;
+  padding: 0;
+}
+
+.schedule-list li {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.schedule-list li strong {
+  display: block;
+  color: #0056b3;
+  margin-bottom: 0.5rem;
+}
+
+.post-op-care {
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+
+.post-op-care ul {
+  padding-left: 1.5rem;
+}
+
+.post-op-care li {
+  margin-bottom: 0.5rem;
+}
+
+/* 스케줄과 준비사항을 묶는 새 컨테이너 */
+.combined-schedule-prep-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+  overflow: hidden;
+}
+
+/* AI 준비사항 텍스트 섹션 */
+.ai-prep-section {
+  padding: 30px;
+  background: none;
+}
+
+/* AI 준비사항 내용 스타일 */
+.ai-prep-content {
+  color: #334155;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.ai-prep-content p {
+  margin-bottom: 1rem;
+}
+
+.ai-prep-content strong {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.ai-prep-content ul,
+.ai-prep-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.ai-prep-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* 첫 번째 단계 진단 요약 섹션 스타일 (유지) */
+.initial-diagnosis-section {
+    margin-top: 20px;
 } 

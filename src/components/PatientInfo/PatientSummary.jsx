@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import './PatientSummary.css';
 
 const PatientSummary = ({ patientInfo }) => {
@@ -78,7 +79,7 @@ const PatientSummary = ({ patientInfo }) => {
         <div className="summary-section ai-diagnosis">
           <h3>AI 생성 소견</h3>
           <div className="ai-diagnosis-content">
-            {patientInfo.explain}
+            <ReactMarkdown>{patientInfo.explain}</ReactMarkdown>
           </div>
         </div>
       )}

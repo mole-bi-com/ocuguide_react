@@ -8,6 +8,37 @@ import DiagnosisSummary from '../components/SurgeryInfo/DiagnosisSummary';
 import CalendarSchedule from '../components/SurgeryInfo/CalendarSchedule';
 import { trackStepProgress, completeSession } from '../services/api';
 import './SurgeryInfoPage.css';
+import { format, add, sub } from 'date-fns';
+import ReactMarkdown from 'react-markdown';
+
+// 날짜 포맷팅 헬퍼 함수 추가 (useState 선언 전에)
+const formatDate = (date) => {
+  try {
+    return format(new Date(date), 'yyyy년 MM월 dd일');
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return String(date);
+  }
+};
+
+// AI 소견에서 "수술 준비 및 주의사항" 부분만 추출하는 헬퍼 함수
+const getPreparationText = (fullExplanation) => {
+  if (!fullExplanation) {
+    return 'AI 소견 정보를 불러오는 중입니다...';
+  }
+  // "수술 준비 및 주의사항"을 기준으로 텍스트 분리 시작
+  const marker = '수술 준비 및 주의사항';
+  const startIndex = fullExplanation.indexOf(marker);
+  
+  if (startIndex === -1) {
+    // 해당 문구를 찾지 못한 경우, 사용자에게 알림
+    console.warn("Marker '수술 준비 및 주의사항' not found in AI explanation.");
+    return '수술 준비 및 주의사항 정보를 찾을 수 없습니다.'; 
+  }
+  
+  // 해당 문구부터 끝까지의 텍스트 반환
+  return fullExplanation.substring(startIndex);
+};
 
 const SurgeryInfoPage = () => {
   const { patientInfo } = usePatientContext();
@@ -138,8 +169,50 @@ const SurgeryInfoPage = () => {
     },
     { 
       id: 6, 
-      title: "수술 후 주의사항",
-      content: "수술 후 주의해야 할 사항들을 안내합니다.",
+      title: "수술 후 주의사항 및 스케줄",
+      content: ({ patientInfo }) => {
+        const surgeryDate = new Date(patientInfo.surgery_date);
+        const dayBefore = formatDate(sub(surgeryDate, { days: 1 }));
+        const surgeryDay = formatDate(surgeryDate);
+        const dayAfter = formatDate(add(surgeryDate, { days: 1 }));
+        const weekAfter = formatDate(add(surgeryDate, { weeks: 1 }));
+
+        return (
+          <div>
+            <div className="surgery-schedule">
+              <h4>수술 전후 스케줄</h4>
+              <ul className="schedule-list">
+                <li>
+                  <strong>{dayBefore}</strong>
+                  <p>- 수술 전날: 수술 시간 안내 전화</p>
+                </li>
+                <li>
+                  <strong>{surgeryDay}</strong>
+                  <p>- 수술 당일: 아침 약 복용, 당일 입원 및 퇴원</p>
+                </li>
+                <li>
+                  <strong>{dayAfter}</strong>
+                  <p>- 수술 다음날: 첫 번째 외래 진료</p>
+                </li>
+                <li>
+                  <strong>{weekAfter}</strong>
+                  <p>- 수술 1주일 후: 경과 관찰 진료</p>
+                </li>
+              </ul>
+            </div>
+            <div className="post-op-care">
+              <h4>수술 후 주의사항</h4>
+              <ul>
+                <li>수술 후 1주일간은 눈을 비비거나 누르지 않도록 주의</li>
+                <li>처방된 안약을 정해진 시간에 점안</li>
+                <li>수영장, 사우나 등은 2주 이상 피하기</li>
+                <li>과도한 운동이나 무거운 물건 들기 피하기</li>
+                <li>정기적인 외래 진료 방문하기</li>
+              </ul>
+            </div>
+          </div>
+        );
+      },
       media: {
         type: 'audio',
         files: [
@@ -341,7 +414,7 @@ const SurgeryInfoPage = () => {
       </div>
 
       <div className="step-content">
-        <InfoStep step={steps[currentStep]} />
+        <InfoStep step={steps[currentStep]} patientInfo={patientInfo} />
       </div>
 
       <div className="step-navigation">
@@ -361,13 +434,24 @@ const SurgeryInfoPage = () => {
         </button>
       </div>
 
-      {currentStep === 0 && (
-        <DiagnosisSummary patientInfo={patientInfo} />
+      {currentStep === 0 && patientInfo && (
+        <div className="initial-diagnosis-section">
+           <DiagnosisSummary patientInfo={patientInfo} />
+        </div>
       )}
 
-      {currentStep === steps.length - 1 && (
-        <div className="calendar-section">
-          <CalendarSchedule patientInfo={patientInfo} />
+      {currentStep === steps.length - 1 && patientInfo && (
+        <div className="combined-schedule-prep-section"> 
+          <div className="calendar-section"> 
+            <CalendarSchedule patientInfo={patientInfo} />
+          </div>
+          <div className="ai-prep-section"> 
+            <div className="ai-prep-content">
+              <ReactMarkdown>
+                {getPreparationText(patientInfo.explain)}
+              </ReactMarkdown>
+            </div>
+          </div>
         </div>
       )}
 

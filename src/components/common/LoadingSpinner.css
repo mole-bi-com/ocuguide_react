@@ -1,28 +1,67 @@
-.loading-spinner {
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  min-height: 100px;
+  width: 100%;
+  padding: 20px;
 }
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #4a90e2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+.loading-bar-container {
+  width: 80%; /* 바의 너비 */
+  max-width: 300px; /* 최대 너비 */
+  height: 12px; /* 바의 높이 */
+  background-color: #e0e7ff; /* 앱 테마에 맞춘 연한 파란색 배경 */
+  border-radius: 6px; /* 둥근 모서리 */
+  overflow: hidden; /* 내부 요소가 넘치지 않도록 */
+  margin-bottom: 1rem; /* 텍스트와의 간격 */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* 내부 그림자 효과 */
 }
 
-.loading-spinner p {
-  color: #4a5568;
-  font-size: 1rem;
+.loading-bar-fill {
+  height: 100%;
+  width: 100%; /* 너비를 100%로 고정 */
+  background-color: #3b82f6; /* 앱 테마의 메인 파란색 */
+  border-radius: 6px; /* 둥근 모서리 */
+  background-image: linear-gradient(
+    -45deg, /* 각도 반전 */
+    rgba(255, 255, 255, 0.2) 25%, /* 약간 더 진하게 */
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.2) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 40px 40px;
+  /* 애니메이션 변경: 채우는 애니메이션 대신 줄무늬만 움직이도록 */
+  animation: loading-stripes 1s linear infinite; 
+}
+
+.loading-container p { /* 클래스명 수정 */
+  color: #4b5563;
+  font-size: 0.9rem; /* 폰트 크기 조정 */
   margin: 0;
+  font-weight: 500;
+  text-transform: uppercase; /* 대문자 변환 (선택 사항) */
+  letter-spacing: 1px; /* 글자 간격 */
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* 기존 loading-fill 애니메이션 삭제 */
+/* @keyframes loading-fill { ... } */
+
+/* 대각선 패턴 이동 애니메이션 */
+@keyframes loading-stripes {
+  from { background-position: 40px 0; }
+  to { background-position: 0 0; }
+}
+
+/* 기존 spinner 관련 스타일 제거 */
+.spinner-container,
+.spinner-circle,
+.spinner-circle-dot,
+@keyframes spinner-rotate,
+@keyframes spinner-dot {
+  /* 이 부분은 삭제됩니다 */
 } 
