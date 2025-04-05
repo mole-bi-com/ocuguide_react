@@ -666,4 +666,54 @@
 /* 첫 번째 단계 진단 요약 섹션 스타일 (유지) */
 .initial-diagnosis-section {
     margin-top: 20px;
+}
+
+/* Completion Options Section */
+.completion-options-container {
+  padding: 40px; /* Add some padding */
+  text-align: center; /* Center align text */
+  background-color: #f8fafc; /* Light background */
+  border-radius: 12px; /* Match other containers */
+  margin-top: 30px; /* Space from progress bar */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* Consistent shadow */
+}
+
+.completion-options-container h2 {
+  color: #1e3a8a; /* Match header colors */
+  font-size: 1.8rem; /* Slightly larger title */
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.completion-options-container p {
+  color: #475569; /* Consistent description color */
+  font-size: 1.1rem;
+  margin-bottom: 30px; /* Space before buttons */
+}
+
+.completion-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: center; /* Center buttons horizontally */
+  gap: 15px; /* Add vertical space between buttons */
+  width: 100%;
+  max-width: 300px; /* Limit button container width */
+  margin: 0 auto; /* Center the button container */
+}
+
+/* Optional: Adjust button width if needed */
+.completion-buttons .nav-button {
+  width: 100%; /* Make buttons take full width of container */
+  padding: 14px 20px; /* Adjust padding if needed */
+}
+
+/* Style for disabled step items when completion options are shown */
+.step-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.step-item.disabled:hover {
+  transform: none; /* Prevent hover effect */
+  box-shadow: none; /* Remove hover shadow */
 } 

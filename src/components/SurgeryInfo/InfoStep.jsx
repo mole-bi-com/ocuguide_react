@@ -3,6 +3,7 @@ import './InfoStep.css';
 
 const InfoStep = ({ step }) => {
   const [playingAudio, setPlayingAudio] = useState(null);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const audioRef = useRef(null);
 
   const handleAudioEnd = () => {
@@ -113,7 +114,31 @@ const InfoStep = ({ step }) => {
     return textMap[caption] || '답변 준비 중입니다.';
   };
 
+  const handleNextCard = () => {
+    if (step.media && step.media.files && currentCardIndex < step.media.files.length - 1) {
+      setCurrentCardIndex(currentCardIndex + 1);
+      setPlayingAudio(null);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
+  };
+
+  const handlePrevCard = () => {
+    if (currentCardIndex > 0) {
+      setCurrentCardIndex(currentCardIndex - 1);
+      setPlayingAudio(null);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
+  };
+
   const renderMedia = () => {
+    if (!step.media) return null;
+
     switch (step.media.type) {
       case 'text':
         return (
@@ -124,41 +149,72 @@ const InfoStep = ({ step }) => {
           </div>
         );
       case 'audio':
+        if (!step.media.files || !Array.isArray(step.media.files) || step.media.files.length === 0) {
+          return <p>정보를 불러올 수 없습니다.</p>;
+        }
+        const currentAudio = step.media.files[currentCardIndex];
+        if (!currentAudio) return null;
+
+        const showNavigation = step.media.files.length > 1;
+
         return (
-          <div className="audio-content">
-            {step.media.files.map((audio, index) => (
-              <div key={index} className="audio-item">
+          <div className="audio-content-wrapper">
+            <div className="audio-item-container">
+              {showNavigation && (
+                <button
+                  onClick={handlePrevCard}
+                  disabled={currentCardIndex === 0}
+                  className="card-arrow prev-arrow"
+                  aria-label="Previous Card"
+                >
+                  <span className="material-icons">chevron_left</span>
+                </button>
+              )}
+
+              <div className="audio-item">
                 <div className="audio-item-header">
-                  <span className="audio-number">{index + 1}</span>
-                  <p className="audio-caption">{audio.caption}</p>
+                  <span className="audio-number">{`${currentCardIndex + 1}/${step.media.files.length}`}</span>
+                  <p className="audio-caption">{currentAudio.caption}</p>
                 </div>
-                <p className="audio-text">{getAudioText(audio.caption)}</p>
+                <p className="audio-text">{getAudioText(currentAudio.caption)}</p>
                 <div className="audio-button-wrapper">
-                  <button 
-                    onClick={() => playAudio(audio)}
-                    className={`audio-button ${playingAudio === getAudioUrl(audio.caption) ? 'playing' : ''}`}
+                  <button
+                    onClick={() => playAudio(currentAudio)}
+                    className={`audio-button ${playingAudio === getAudioUrl(currentAudio.caption) ? 'playing' : ''}`}
                   >
-                    {playingAudio === getAudioUrl(audio.caption) ? (
+                    {playingAudio === getAudioUrl(currentAudio.caption) ? (
                       <>
-                        <span className="material-icons" style={{ fontSize: '20px', marginRight: '4px' }}>pause</span>
+                        <span className="material-icons">pause</span>
                         정지
                       </>
                     ) : (
                       <>
-                        <span className="material-icons" style={{ fontSize: '20px', marginRight: '4px' }}>play_arrow</span>
+                        <span className="material-icons">play_arrow</span>
                         듣기
                       </>
                     )}
                   </button>
                 </div>
               </div>
-            ))}
+
+              {showNavigation && (
+                <button
+                  onClick={handleNextCard}
+                  disabled={currentCardIndex === step.media.files.length - 1}
+                  className="card-arrow next-arrow"
+                  aria-label="Next Card"
+                >
+                  <span className="material-icons">chevron_right</span>
+                </button>
+              )}
+            </div>
+
             <audio
               ref={audioRef}
               onEnded={handleAudioEnd}
               style={{ display: 'none' }}
             />
-            {step.media.video && (
+            {step.media.video && currentCardIndex === step.media.files.length - 1 && (
               <div className="video-content">
                 <h4>백내장 수술 영상</h4>
                 <div className="video-wrapper">
@@ -168,7 +224,7 @@ const InfoStep = ({ step }) => {
                     height="315"
                     frameBorder="0"
                     allowFullScreen
-                    title={step.media.video.caption}
+                    title={step.media.video.caption || '백내장 수술 영상'}
                   />
                 </div>
               </div>

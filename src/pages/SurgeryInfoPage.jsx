@@ -56,6 +56,7 @@ const SurgeryInfoPage = () => {
   const [showDiagnosis, setShowDiagnosis] = useState(false);
   const [showUnderstandingPrompt, setShowUnderstandingPrompt] = useState(false);
   const [understandingLevel, setUnderstandingLevel] = useState(0);
+  const [showCompletionOptions, setShowCompletionOptions] = useState(false);
 
   // Steps information
   const [steps] = useState([
@@ -300,15 +301,18 @@ const SurgeryInfoPage = () => {
         if (currentSession) {
           await completeSession(currentSession);
         }
+        // Set progress to include the last step
+        setProgress(currentStep); 
+        
+        // Show completion options instead of diagnosis or navigating away
+        setShowCompletionOptions(true); 
       } catch (error) {
         console.error('Failed to complete session:', error);
+        // Optionally handle error display to the user
       }
       
-      // 마지막 단계도 progress에 포함
-      setProgress(currentStep);
-      
-      // Navigate to summary page or show diagnosis
-      setShowDiagnosis(true);
+      // Remove this if navigating away
+      // setShowDiagnosis(true); 
     }
   };
 
@@ -322,6 +326,19 @@ const SurgeryInfoPage = () => {
       setCurrentStep(currentStep - 1);
       // progress는 이전 상태를 유지 (이전에 완료한 단계에 대한 정보는 변경하지 않음)
     }
+  };
+
+  // Handler to restart the info steps
+  const handleRestart = () => {
+    setCurrentStep(0);
+    // Optionally reset progress if you want the visual indicators to reset
+    // setProgress(-1); // Or manage progress reset logic as needed
+    setShowCompletionOptions(false);
+  };
+
+  // Handler to navigate to chatbot
+  const handleGoToChatbot = () => {
+    navigate('/chatbot'); // Assuming '/chatbot' is your chatbot route
   };
 
   // New Understanding Level Component
@@ -391,10 +408,9 @@ const SurgeryInfoPage = () => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`step-item ${index === currentStep ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'}`}
+            className={`step-item ${index === currentStep && !showCompletionOptions ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'} ${showCompletionOptions ? 'disabled' : ''}`}
             onClick={() => {
-              // 이미 완료된 단계나 현재 진행 중인 단계+1까지만 이동 가능
-              if (index <= progress + 1) {
+              if (!showCompletionOptions && index <= progress + 1) {
                 setCurrentStep(index);
               }
             }}
@@ -407,51 +423,67 @@ const SurgeryInfoPage = () => {
               )}
             </div>
             <div className="step-title">{step.title}</div>
-            {index === currentStep && (
+            {index === currentStep && !showCompletionOptions && (
               <div className="current-step-indicator"></div>
             )}
           </div>
         ))}
       </div>
 
-      <div className="step-content">
-        <InfoStep step={steps[currentStep]} patientInfo={patientInfo} />
-      </div>
-
-      <div className="step-navigation">
-        <button 
-          onClick={handlePrevStep}
-          disabled={currentStep === 0}
-          className="nav-button prev"
-        >
-          이전 단계
-        </button>
-        <button 
-          onClick={handleNextStep}
-          disabled={currentStep === steps.length - 1}
-          className="nav-button next"
-        >
-          다음 단계
-        </button>
-      </div>
-
-      {currentStep === 0 && patientInfo && (
-        <div className="initial-diagnosis-section">
-           <DiagnosisSummary patientInfo={patientInfo} />
-        </div>
-      )}
-
-      {currentStep === steps.length - 1 && patientInfo && (
-        <div className="combined-schedule-prep-section"> 
-          <div className="calendar-section"> 
-            <CalendarSchedule patientInfo={patientInfo} />
+      {!showCompletionOptions ? (
+        <>
+          <div className="step-content">
+            <InfoStep step={steps[currentStep]} patientInfo={patientInfo} />
           </div>
-          <div className="ai-prep-section"> 
-            <div className="ai-prep-content">
-              <ReactMarkdown>
-                {getPreparationText(patientInfo.explain)}
-              </ReactMarkdown>
+
+          <div className="step-navigation">
+            <button 
+              onClick={handlePrevStep}
+              disabled={currentStep === 0}
+              className="nav-button prev"
+            >
+              이전 단계
+            </button>
+            <button 
+              onClick={handleNextStep}
+              className="nav-button next"
+            >
+              {currentStep === steps.length - 1 ? '완료' : '다음 단계'}
+            </button>
+          </div>
+
+          {currentStep === 0 && patientInfo && (
+             <div className="initial-diagnosis-section">
+               <DiagnosisSummary patientInfo={patientInfo} />
+             </div>
+          )}
+
+          {currentStep === steps.length - 1 && patientInfo && (
+            <div className="combined-schedule-prep-section"> 
+              <div className="calendar-section"> 
+                <CalendarSchedule patientInfo={patientInfo} />
+              </div>
+              <div className="ai-prep-section"> 
+                <div className="ai-prep-content">
+                  <ReactMarkdown>
+                    {getPreparationText(patientInfo.explain)}
+                  </ReactMarkdown>
+                </div>
+              </div>
             </div>
+          )}
+        </>
+      ) : (
+        <div className="completion-options-container">
+          <h2>수술 정보 확인 완료!</h2>
+          <p>모든 수술 정보를 확인하셨습니다. 다음 단계를 선택해주세요.</p>
+          <div className="completion-buttons">
+            <button onClick={handleRestart} className="nav-button prev">
+              처음으로 돌아가기
+            </button>
+            <button onClick={handleGoToChatbot} className="nav-button next">
+              챗봇 상담하기
+            </button>
           </div>
         </div>
       )}
