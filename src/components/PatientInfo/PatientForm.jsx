@@ -79,12 +79,6 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
       newErrors.surgery_time = '수술 시간을 선택해주세요';
     }
     
-    if (!formData.phone) {
-      newErrors.phone = '전화번호를 입력해주세요';
-    } else if (!/^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/.test(formData.phone)) {
-      newErrors.phone = '올바른 전화번호 형식이 아닙니다';
-    }
-    
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = '올바른 이메일 형식이 아닙니다';
     }
@@ -335,7 +329,7 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
       <div className="form-section">
         <h3>연락처 정보</h3>
         <div className="form-group">
-          <label htmlFor="phone">전화번호 *</label>
+          <label htmlFor="phone">전화번호</label>
           <input
             type="tel"
             id="phone"
@@ -359,43 +353,6 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
             className={errors.email ? 'error' : ''}
           />
           {errors.email && <span className="error-message">{errors.email}</span>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="address">주소</label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      <div className="form-section">
-        <h3>비상 연락처</h3>
-        <div className="form-group">
-          <label htmlFor="emergencyContact">비상 연락처 이름</label>
-          <input
-            type="text"
-            id="emergencyContact"
-            name="emergencyContact"
-            value={formData.emergencyContact}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="emergencyPhone">비상 연락처 전화번호</label>
-          <input
-            type="tel"
-            id="emergencyPhone"
-            name="emergencyPhone"
-            value={formData.emergencyPhone}
-            onChange={handleChange}
-            placeholder="010-0000-0000"
-          />
         </div>
       </div>
 

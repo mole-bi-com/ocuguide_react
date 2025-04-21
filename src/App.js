@@ -11,12 +11,12 @@ import './styles/global.css';
 // 지연 로딩을 위한 컴포넌트 설정
 const HomePage = lazy(() => import('./pages/HomePage'));
 const PatientInfoPage = lazy(() => import('./pages/PatientInfoPage'));
-const SurgeryInfoPage = lazy(() => import('./pages/SurgeryInfoPage'));
 const ChatbotPage = lazy(() => import('./pages/ChatbotPage'));
 const StatisticsPage = lazy(() => import('./pages/StatisticsPage'));
 const SupabaseTestPage = lazy(() => import('./pages/SupabaseTestPage'));
 const SupabaseAdminPage = lazy(() => import('./pages/SupabaseAdminPage'));
 const SupabaseTestSimple = lazy(() => import('./pages/SupabaseTestSimple'));
+const SurgeryInfoPage = lazy(() => import('./pages/SurgeryInfoPage'));
 
 // 로딩 컴포넌트
 const LoadingFallback = () => (
