@@ -110,7 +110,7 @@ const SurgeryInfoPage = () => {
       media: {
         type: 'audio',
         files: [
-          { caption: '백내장 수술 후에는 바로 잘 보이게 되나요?' },
+          { caption: '백내장 수술 후에는 언제부터 잘 보이게 되나요?' },
           { caption: '백내장 수술 이후 일상생활은 언제부터 가능한가요?' },
           { caption: '백내장 수술 후에는 안약을 얼마나 사용하나요?' },
           { caption: '백내장 수술 후에는 병원에 얼마나 자주 와야하나요?' }
