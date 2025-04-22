@@ -47,13 +47,13 @@ const ChatbotPage = () => {
       const response = quickQuestionsData[message] || await sendChatMessage(message);
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
 
-      if (speechMode) {
-        const audioUrl = await textToSpeech(response);
-        if (audioPlayer.current) {
-          audioPlayer.current.src = audioUrl;
-          audioPlayer.current.play();
-          setIsSpeaking(true);
-        }
+      // The line "if (speechMode) {" below should be removed
+      // Keep the following block for Text-to-Speech
+      const audioUrl = await textToSpeech(response);
+      if (audioPlayer.current) {
+        audioPlayer.current.src = audioUrl;
+        audioPlayer.current.play();
+        setIsSpeaking(true);
       }
     } catch (error) {
       console.error('Error sending message:', error);

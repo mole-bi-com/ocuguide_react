@@ -448,9 +448,16 @@ export const textToSpeech = async (text) => {
       }
     );
     
-    // 응답에서 오디오 데이터를 Base64 문자열로 변환
-    const audioData = Buffer.from(response.data).toString('base64');
-    const audioUrl = `data:audio/mp3;base64,${audioData}`;
+    // Convert the ArrayBuffer response to a Blob
+    const audioBlob = new Blob([response.data], { type: 'audio/mp3' });
+    
+    // Create a Data URL from the Blob
+    const audioUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(audioBlob);
+    });
     
     return audioUrl;
   } catch (error) {
