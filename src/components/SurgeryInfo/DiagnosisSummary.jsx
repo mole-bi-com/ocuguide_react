@@ -34,35 +34,8 @@ const DiagnosisSummary = ({ patientInfo }) => {
         </div>
       </div>
 
-      {patientInfo.diagnosis && (
-        <div className="summary-section diagnosis-info">
-          <h3>등록된 1차 소견</h3>
-          {Object.entries(patientInfo.diagnosis).map(([category, items]) => {
-            if (!items || items.length === 0) return null;
-            return (
-              <div key={category} className="diagnosis-item">
-                <span className="category">{category}:</span>
-                <span className="items">{items.join(', ')}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="summary-section">
-        <h3>수술 후 주의사항</h3>
-        <div className="precautions">
-          <ol>
-            <li>수술 후 1주일간은 눈을 비비지 마세요.</li>
-            <li>수술 후 1주일간은 세안 시 눈 주변에 물이 들어가지 않도록 주의하세요.</li>
-            <li>수술 후 1주일간은 과격한 운동을 피하세요.</li>
-            <li>처방된 안약을 정해진 시간에 점안하세요.</li>
-            <li>외출 시에는 선글라스를 착용하여 자외선을 차단하세요.</li>
-            <li>먼지가 많은 곳은 피하고, 실내 활동을 권장합니다.</li>
-            <li>정기적인 외래 진료를 통해 경과를 관찰하세요.</li>
-          </ol>
-        </div>
-      </div>
+      {/* Removed "등록된 1차 소견" section */}
+      {/* Removed "수술 후 주의사항" section */}
     </div>
   );
 };
