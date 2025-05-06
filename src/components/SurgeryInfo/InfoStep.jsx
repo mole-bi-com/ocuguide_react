@@ -436,7 +436,7 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
               {showNavigation && (
                 <button
                   onClick={handleNextCard}
-                  disabled={currentCardIndex === step.media.files.length - 1}
+                  disabled={currentCardIndex === step.media.files.length - 1 || (step.media.type === 'audio' && !audioCompleted)}
                   className={`card-arrow next-arrow ${audioCompleted ? 'completed-arrow' : ''}`}
                   aria-label="Next Card"
                 >
