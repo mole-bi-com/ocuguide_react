@@ -1,0 +1,164 @@
+.post-surgery-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+.page-title {
+  text-align: center;
+  color: #2d3748;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.post-surgery-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .post-surgery-content {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .ai-opinion-section {
+    grid-column: 1 / -1;
+  }
+}
+
+.schedule-section,
+.precautions-section,
+.ai-opinion-section {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-section:hover,
+.precautions-section:hover,
+.ai-opinion-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.schedule-section h2,
+.precautions-section h2,
+.ai-opinion-section h2 {
+  color: #3b82f6;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 1.8rem;
+}
+
+.schedule-section h3 {
+  color: #4a5568;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.calendar-view {
+  margin-bottom: 2rem;
+}
+
+.schedule-list {
+  list-style: none;
+  padding: 0;
+}
+
+.schedule-list li {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+.schedule-list li strong {
+  color: #1e40af;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.schedule-list li p {
+  color: #4b5563;
+  margin: 0;
+}
+
+.precautions-list ul {
+  padding-left: 1.5rem;
+}
+
+.precautions-list li {
+  margin-bottom: 1rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.ai-opinion-content {
+  background-color: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  line-height: 1.8;
+}
+
+.ai-opinion-content p {
+  margin-bottom: 1rem;
+}
+
+.ai-opinion-content ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.nav-button {
+  background-color: #4a5568;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-button:hover {
+  background-color: #2d3748;
+  transform: translateY(-2px);
+}
+
+.nav-button.next {
+  background-color: #3b82f6;
+}
+
+.nav-button.next:hover {
+  background-color: #2563eb;
+}
+
+@media (max-width: 767px) {
+  .navigation-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .nav-button {
+    width: 100%;
+    max-width: 300px;
+  }
+} 

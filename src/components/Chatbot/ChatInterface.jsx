@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import AudioRecorder from './AudioRecorder';
 import './ChatInterface.css';
 
 const ChatInterface = ({ messages, onSendMessage, isLoadingResponse }) => {
@@ -19,6 +20,13 @@ const ChatInterface = ({ messages, onSendMessage, isLoadingResponse }) => {
     if (inputMessage.trim() && !isLoadingResponse) {
       onSendMessage(inputMessage);
       setInputMessage('');
+    }
+  };
+
+  const handleAudioRecorded = async (audioBlob) => {
+    // This function will be implemented in the parent component
+    if (typeof onAudioRecorded === 'function') {
+      onAudioRecorded(audioBlob);
     }
   };
 
@@ -44,24 +52,22 @@ const ChatInterface = ({ messages, onSendMessage, isLoadingResponse }) => {
         <div ref={messagesEndRef} />
       </div>
       
-      <form onSubmit={handleSubmit} className="chat-input-container">
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="메시지를 입력하세요..."
-          className="chat-input"
+      <div className="chat-input-container">
+        <AudioRecorder 
+          onAudioRecorded={handleAudioRecorded} 
           disabled={isLoadingResponse}
         />
-        <button 
-          type="submit" 
-          className="send-button"
-          disabled={!inputMessage.trim() || isLoadingResponse}
-        >
-          전송
-        </button>
-      </form>
+        
+        <form onSubmit={handleSubmit} className="text-input-container">
+          <button 
+            type="submit" 
+            className="send-button"
+            disabled={!inputMessage.trim() || isLoadingResponse}
+          >
+            전송
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

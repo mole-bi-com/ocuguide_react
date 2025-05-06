@@ -234,4 +234,54 @@ textarea {
   .diagnosis-category {
     padding: 0.75rem;
   }
+}
+
+/* Birthdate input styling */
+.birthdate-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.date-input {
+  width: 100%;
+}
+
+.numeric-date-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.numeric-date-input {
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.year-input {
+  flex: 2;
+  width: 70px;
+}
+
+.month-input, .day-input {
+  flex: 1;
+  width: 50px;
+}
+
+.date-separator {
+  color: #718096;
+  font-weight: 500;
+}
+
+.numeric-date-input::-webkit-inner-spin-button,
+.numeric-date-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numeric-date-input {
+  -moz-appearance: textfield;
 } 

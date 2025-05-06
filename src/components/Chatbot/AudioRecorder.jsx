@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
 import './AudioRecorder.css';
 
-const AudioRecorder = ({ onAudioRecorded }) => {
+const AudioRecorder = ({ onAudioRecorded, disabled }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const mediaRecorder = useRef(null);
   const timerInterval = useRef(null);
 
   const startRecording = async () => {
+    if (disabled) return;
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder.current = new MediaRecorder(stream);
@@ -56,8 +58,9 @@ const AudioRecorder = ({ onAudioRecorded }) => {
   return (
     <div className="audio-recorder">
       <button
-        className={`record-button ${isRecording ? 'recording' : ''}`}
+        className={`record-button ${isRecording ? 'recording' : ''} ${disabled ? 'disabled' : ''}`}
         onClick={isRecording ? stopRecording : startRecording}
+        disabled={disabled && !isRecording}
       >
         {isRecording ? '녹음 중지' : '음성으로 질문하기'}
       </button>

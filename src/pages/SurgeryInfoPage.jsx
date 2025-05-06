@@ -95,11 +95,14 @@ const SurgeryInfoPage = () => {
     {
       id: 2,
       title: "인공수정체 결정",
-      content: "인공수정체의 종류와 선택 방법을 안내합니다.",
+      content: "백내장 수술 시 사용하는 인공수정체 종류와 특징에 대해 설명합니다.",
       media: {
         type: 'audio',
         files: [
-          { caption: '백내장 수술시 눈의 도수는 어떻게 되나요?' },
+          { caption: '인공수정체 기본 원리' },
+          { caption: '다초점 인공수정체 (Multifocal)' },
+          { caption: '강화 단초점 인공수정체' },
+          { caption: '난시교정렌즈 (Toric)와 최종 결정' }
         ]
       }
     },
@@ -124,62 +127,12 @@ const SurgeryInfoPage = () => {
       media: {
         type: 'audio',
         files: [
-          { caption: '백내장 수술의 부작용에는 어떤 것들이 있나요?' }
-        ]
-      }
-    },
-    {
-      id: 6, // This ID will be updated after filtering
-      title: "수술 후 주의사항 및 스케줄",
-      content: ({ patientInfo }) => { // Dynamic content function
-        const surgeryDate = new Date(patientInfo.surgery_date);
-        const dayBefore = formatDate(sub(surgeryDate, { days: 1 }));
-        const surgeryDay = formatDate(surgeryDate);
-        const dayAfter = formatDate(add(surgeryDate, { days: 1 }));
-        const weekAfter = formatDate(add(surgeryDate, { weeks: 1 }));
-
-        return (
-          <div>
-            <div className="surgery-schedule">
-              <h4>수술 전후 스케줄</h4>
-              <ul className="schedule-list">
-                <li>
-                  <strong>{dayBefore}</strong>
-                  <p>- 수술 전날: 수술 시간 안내 전화</p>
-                </li>
-                <li>
-                  <strong>{surgeryDay}</strong>
-                  <p>- 수술 당일: 아침 약 복용, 당일 입원 및 퇴원</p>
-                </li>
-                <li>
-                  <strong>{dayAfter}</strong>
-                  <p>- 수술 다음날: 첫 번째 외래 진료</p>
-                </li>
-                <li>
-                  <strong>{weekAfter}</strong>
-                  <p>- 수술 1주일 후: 경과 관찰 진료</p>
-                </li>
-              </ul>
-            </div>
-            <div className="post-op-care">
-              <h4>수술 후 주의사항</h4>
-              <ul>
-                <li>수술 후 1주일간은 눈을 비비거나 누르지 않도록 주의</li>
-                <li>처방된 안약을 정해진 시간에 점안</li>
-                <li>수영장, 사우나 등은 2주 이상 피하기</li>
-                <li>과도한 운동이나 무거운 물건 들기 피하기</li>
-                <li>정기적인 외래 진료 방문하기</li>
-              </ul>
-            </div>
-          </div>
-        );
-      },
-      media: {
-        type: 'audio',
-        files: [
-          {
-            caption: '수술 후 주의해야 할 것에는 무엇이 있나요?'
-          }
+          { caption: '수술 중 합병증' },
+          { caption: '수술 후 경미한 부작용' },
+          { caption: '수술 후 심한 합병증' },
+          { caption: '인공수정체의 탈구/아탈구' },
+          { caption: '각막부종' },
+          { caption: '후낭혼탁' }
         ]
       }
     }
@@ -276,12 +229,6 @@ const SurgeryInfoPage = () => {
     }
   };
 
-  const handleRestart = () => {
-    setCurrentStep(0);
-    setProgress(-1); // Reset progress
-    setShowCompletionOptions(false);
-  };
-
   const handleGoToChatbot = () => {
     navigate('/chatbot');
   };
@@ -338,10 +285,11 @@ const SurgeryInfoPage = () => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`step-item ${index === currentStep && !showCompletionOptions ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'} ${showCompletionOptions ? 'disabled' : ''}`}
+            className={`step-item ${index === currentStep && !showCompletionOptions ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'}`}
             onClick={() => {
-              if (!showCompletionOptions && index <= progress + 1) { // Allow clicking on completed steps and the next step
+              if (index <= progress) { // Allow clicking on completed steps to navigate back
                 setCurrentStep(index);
+                setShowCompletionOptions(false); // Hide completion options when navigating to a specific step
               }
             }}
           >
@@ -404,30 +352,12 @@ const SurgeryInfoPage = () => {
                <DiagnosisSummary patientInfo={patientInfo} />
              </div>
           )}
-
-          {currentStep === steps.length - 1 && patientInfo && (
-            <div className="combined-schedule-prep-section">
-              <div className="calendar-section">
-                <CalendarSchedule patientInfo={patientInfo} />
-              </div>
-              <div className="ai-prep-section">
-                <div className="ai-prep-content">
-                  <ReactMarkdown>
-                    {getPreparationText(patientInfo.explain)}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </div>
-          )}
         </>
       ) : (
         <div className="completion-options-container">
           <h2>수술 정보 확인 완료!</h2>
-          <p>모든 수술 정보를 확인하셨습니다. 다음 단계를 선택해주세요.</p>
+          <p>모든 수술 정보를 확인하셨습니다. 다시 보고 싶은 단계가 있으면 위의 단계 버튼을 클릭하시거나, 다음 단계를 선택해주세요.</p>
           <div className="completion-buttons">
-            <button onClick={handleRestart} className="nav-button prev">
-              처음으로 돌아가기
-            </button>
             <button onClick={handleGoToChatbot} className="nav-button next">
               챗봇 상담하기
             </button>

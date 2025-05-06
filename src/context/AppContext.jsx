@@ -16,6 +16,7 @@ export const AppProvider = ({ children }) => {
   const [currentStep, setCurrentStep] = useState(0);
   
   // progress는 완료된 단계의 인덱스를 나타냄 (기본값은 -1, 아직 완료된 단계가 없음을 의미)
+  // 최대 5단계까지 존재함 (0부터 4까지)
   const [progress, setProgress] = useState(-1);
   
   const [speechMode, setSpeechMode] = useState(false);

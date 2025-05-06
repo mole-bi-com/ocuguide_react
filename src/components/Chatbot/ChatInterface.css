@@ -20,12 +20,64 @@
 
 .chat-input-container {
   display: flex;
+  align-items: center;
   gap: 12px;
   padding: 16px;
   background: #f8f9fa;
   border-top: 1px solid #e9ecef;
   border-radius: 0 0 12px 12px;
   width: 100%;
+}
+
+/* Audio recorder styles within chat interface */
+.chat-input-container .audio-recorder {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.chat-input-container .record-button {
+  width: 100%;
+  padding: 12px 16px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.chat-input-container .record-button::before {
+  content: '🎤';
+  font-size: 18px;
+}
+
+.chat-input-container .record-button.recording {
+  background-color: #e53e3e;
+  animation: pulse 1.5s infinite;
+}
+
+.chat-input-container .record-button.recording::before {
+  content: '⏹️';
+}
+
+.chat-input-container .recording-time {
+  margin-left: 12px;
+  font-weight: 500;
+  color: #e53e3e;
+}
+
+.text-input-container {
+  display: flex;
+  gap: 12px;
+  flex: 0;
+  width: auto;
 }
 
 .chat-input {
@@ -178,5 +230,17 @@
   }
   50% {
     transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(229, 62, 62, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
   }
 } 

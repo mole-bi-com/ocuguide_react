@@ -191,15 +191,66 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="birth_date">생년월일 *</label>
-            <input
-              type="date"
-              id="birth_date"
-              name="birth_date"
-              value={formData.birth_date}
-              onChange={handleChange}
-              max={new Date().toISOString().split('T')[0]}
-              className={errors.birth_date ? 'error' : ''}
-            />
+            <div className="birthdate-inputs">
+              <input
+                type="date"
+                id="birth_date"
+                name="birth_date"
+                value={formData.birth_date}
+                onChange={handleChange}
+                max={new Date().toISOString().split('T')[0]}
+                className={`date-input ${errors.birth_date ? 'error' : ''}`}
+              />
+              <div className="numeric-date-container">
+                <input
+                  type="number"
+                  placeholder="년"
+                  min="1900"
+                  max={new Date().getFullYear()}
+                  value={formData.birth_date ? new Date(formData.birth_date).getFullYear() : ''}
+                  onChange={(e) => {
+                    const year = e.target.value;
+                    const currentDate = formData.birth_date ? new Date(formData.birth_date) : new Date();
+                    currentDate.setFullYear(year);
+                    const newDateString = currentDate.toISOString().split('T')[0];
+                    handleChange({ target: { name: 'birth_date', value: newDateString } });
+                  }}
+                  className="numeric-date-input year-input"
+                />
+                <span className="date-separator">-</span>
+                <input
+                  type="number"
+                  placeholder="월"
+                  min="1"
+                  max="12"
+                  value={formData.birth_date ? new Date(formData.birth_date).getMonth() + 1 : ''}
+                  onChange={(e) => {
+                    const month = parseInt(e.target.value, 10) - 1; // JavaScript months are 0-indexed
+                    const currentDate = formData.birth_date ? new Date(formData.birth_date) : new Date();
+                    currentDate.setMonth(month);
+                    const newDateString = currentDate.toISOString().split('T')[0];
+                    handleChange({ target: { name: 'birth_date', value: newDateString } });
+                  }}
+                  className="numeric-date-input month-input"
+                />
+                <span className="date-separator">-</span>
+                <input
+                  type="number"
+                  placeholder="일"
+                  min="1"
+                  max="31"
+                  value={formData.birth_date ? new Date(formData.birth_date).getDate() : ''}
+                  onChange={(e) => {
+                    const day = e.target.value;
+                    const currentDate = formData.birth_date ? new Date(formData.birth_date) : new Date();
+                    currentDate.setDate(day);
+                    const newDateString = currentDate.toISOString().split('T')[0];
+                    handleChange({ target: { name: 'birth_date', value: newDateString } });
+                  }}
+                  className="numeric-date-input day-input"
+                />
+              </div>
+            </div>
             {errors.birth_date && <span className="error-message">{errors.birth_date}</span>}
           </div>
 

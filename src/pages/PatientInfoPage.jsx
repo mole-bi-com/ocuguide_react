@@ -140,18 +140,7 @@ const PatientInfoPage = () => {
       {patientInfo && patientInfo.patient_name ? (
         <>
           <PatientSummary patientInfo={patientInfo} />
-          {patientInfo.diagnosis && Object.keys(patientInfo.diagnosis).length > 0 && (
-            <div className="diagnosis-summary">
-              <h4>등록된 소견</h4>
-              {Object.entries(patientInfo.diagnosis)
-                .filter(([_, items]) => items && items.length > 0)
-                .map(([category, items]) => (
-                  <div key={category}>
-                    <strong>{category}:</strong> {items.join(', ')}
-                  </div>
-                ))}
-            </div>
-          )}
+          
           <div className="success-message">
             환자정보가 등록되었습니다. 이제 백내장 수술정보로 이동하실 수 있습니다.
           </div>
@@ -161,6 +150,18 @@ const PatientInfoPage = () => {
               onClick={handleResetInfo}
             >
               환자 정보 재등록
+            </button>
+            <button 
+              className="data-init-button" 
+              onClick={() => {
+                if (window.confirm('환자 데이터를 초기화하시겠습니까?')) {
+                  resetPatientInfo();
+                  // 초기화 후 페이지 새로고침
+                  window.location.reload();
+                }
+              }}
+            >
+              데이터 초기화
             </button>
             <button 
               className="primary-button" 

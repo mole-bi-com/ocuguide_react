@@ -56,14 +56,19 @@
 }
 
 .reset-button {
-  background-color: white;
-  color: #4a5568;
-  border: 2px solid #e2e8f0;
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .reset-button:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e0;
+  background-color: #c53030;
 }
 
 .primary-button {
@@ -74,6 +79,22 @@
 
 .primary-button:hover {
   background-color: #357abd;
+}
+
+.data-init-button {
+  background-color: #805ad5;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.data-init-button:hover {
+  background-color: #6b46c1;
 }
 
 .loading-overlay {

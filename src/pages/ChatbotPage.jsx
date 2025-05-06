@@ -3,7 +3,6 @@ import { usePatientContext } from '../context/PatientContext';
 import { useAppContext } from '../context/AppContext';
 import ChatInterface from '../components/Chatbot/ChatInterface';
 import QuickQuestions from '../components/Chatbot/QuickQuestions';
-import AudioRecorder from '../components/Chatbot/AudioRecorder';
 import { sendChatMessage, textToSpeech, speechToText } from '../services/api';
 import './ChatbotPage.css';
 
@@ -47,7 +46,6 @@ const ChatbotPage = () => {
       const response = quickQuestionsData[message] || await sendChatMessage(message);
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
 
-      // The line "if (speechMode) {" below should be removed
       // Keep the following block for Text-to-Speech
       const audioUrl = await textToSpeech(response);
       if (audioPlayer.current) {
@@ -108,11 +106,9 @@ const ChatbotPage = () => {
         <div className="intro-text">
           <p>- <span className="highlight">OcuGUIDE</span>에서 궁금했던 내용을 무엇이든 물어보세요.</p>
           <p>- ℹ️ 백내장수술정보에서 어려웠던 내용을 챗봇이 성심껏 답변드립니다.</p>
-          <p>- 오른쪽의 마이크를 누르면, 음성으로 질문할 수 있습니다.</p>
+          <p>- 아래 마이크 버튼을 누르면, 음성으로 질문할 수 있습니다.</p>
           <p>- 질문이 끝나신 후, 이제 곧 만나실 주치의에게 추가 설명을 들을 수 있습니다.</p>
         </div>
-        
-        <AudioRecorder onAudioRecorded={handleAudioRecorded} />
       </div>
       
       <QuickQuestions onQuestionSelect={handleQuickQuestionSelect} />
@@ -120,6 +116,7 @@ const ChatbotPage = () => {
       <ChatInterface 
         messages={messages}
         onSendMessage={handleSendMessage}
+        onAudioRecorded={handleAudioRecorded}
         isLoadingResponse={isLoadingResponse}
       />
       

@@ -17,6 +17,7 @@ const SupabaseTestPage = lazy(() => import('./pages/SupabaseTestPage'));
 const SupabaseAdminPage = lazy(() => import('./pages/SupabaseAdminPage'));
 const SupabaseTestSimple = lazy(() => import('./pages/SupabaseTestSimple'));
 const SurgeryInfoPage = lazy(() => import('./pages/SurgeryInfoPage'));
+const PostSurgeryPage = lazy(() => import('./pages/PostSurgeryPage'));
 
 // 로딩 컴포넌트
 const LoadingFallback = () => (
@@ -56,6 +57,13 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <SurgeryInfoPage />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/post-surgery" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <PostSurgeryPage />
                     </Layout>
                   </ProtectedRoute>
                 } />

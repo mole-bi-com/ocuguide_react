@@ -11,7 +11,7 @@ const HomePage = () => {
   // Determine which steps are completed based on progress
   useEffect(() => {
     // progress는 완료된 마지막 단계의 인덱스를 의미함
-    const totalSteps = 7;
+    const totalSteps = 5;
     
     // -1인 경우 아직 완료된 단계가 없음
     if (progress === -1) {
@@ -81,22 +81,6 @@ const HomePage = () => {
             <div className="step-content">
               <h3>백내장 수술의 합병증과 부작용</h3>
               {completedSteps[4] && <div className="step-completed-badge">✓ 완료</div>}
-            </div>
-          </Link>
-          
-          <Link to="/surgery-info" className={`step-card ${completedSteps[5] ? 'completed' : ''}`}>
-            <div className="step-number">6</div>
-            <div className="step-content">
-              <h3>빈번한 질문 리스트</h3>
-              {completedSteps[5] && <div className="step-completed-badge">✓ 완료</div>}
-            </div>
-          </Link>
-          
-          <Link to="/surgery-info" className={`step-card ${completedSteps[6] ? 'completed' : ''}`}>
-            <div className="step-number">7</div>
-            <div className="step-content">
-              <h3>수술 후 주의사항</h3>
-              {completedSteps[6] && <div className="step-completed-badge">✓ 완료</div>}
             </div>
           </Link>
         </div>

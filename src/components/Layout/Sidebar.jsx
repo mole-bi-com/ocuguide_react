@@ -36,6 +36,10 @@ const Sidebar = () => {
           <span role="img" aria-label="surgery">🏥</span>
           수술 정보
         </NavLink>
+        <NavLink to="/post-surgery" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <span role="img" aria-label="post-surgery">🗓️</span>
+          수술 후 주의사항
+        </NavLink>
         <NavLink to="/chatbot" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <span role="img" aria-label="chatbot">💬</span>
           챗봇 상담
