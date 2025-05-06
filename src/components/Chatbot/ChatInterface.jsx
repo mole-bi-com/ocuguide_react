@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import AudioRecorder from './AudioRecorder';
 import './ChatInterface.css';
 
-const ChatInterface = ({ messages, onSendMessage, isLoadingResponse }) => {
+const ChatInterface = ({ messages, onSendMessage, isLoadingResponse, onAudioRecorded }) => {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
