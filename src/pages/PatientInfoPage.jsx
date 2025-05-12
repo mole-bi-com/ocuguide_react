@@ -80,13 +80,13 @@ const PatientInfoPage = () => {
         setIsLoading(true); // 로딩 상태 유지 또는 다시 활성화 (이미 true일 수 있음)
         try {
           const diagnosisMessage = createDiagnosisMessage(patientData);
-          console.log('Generating AI diagnosis with message:', diagnosisMessage);
+          console.log('Generating diagnosis with message:', diagnosisMessage);
 
           const explain = await getDiagnosisDraft(diagnosisMessage);
-          console.log('AI diagnosis generated:', explain);
+          console.log('Diagnosis generated:', explain);
 
-          // explain 정보 추가 (# 제거 포함)
-          patientData.explain = explain.replace(/#/g, "");
+          // explain 정보 추가 (알고리즘 기반 소견)
+          patientData.explain = explain;
           console.log('Updated patientData with explain:', patientData);
 
         } catch (diagnosisError) {

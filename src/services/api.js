@@ -315,56 +315,162 @@ export const getDoctorsList = async () => {
 // Patient diagnosis
 export const getDiagnosisDraft = async (message) => {
   try {
-    // 시스템 메시지 설정
-    const systemMessage = {
-      role: "system",
-      content: `당신은 백내장 수술 경험이 많은 안과 전문의 입니다.
-      지금부터 환자의 최초 검진결과로부터 환자의 상태를 진단하고, 이에 대한 종합소견을 밝힙니다.
-      최초 검진은 다음 여섯개의 항목으로 분류됩니다.
-      #1.전안부, #2.각막, #3.전방, #4. 수정체, #5.망막, #6.시신경
+    // Parse patient info from message
+    const content = message.content;
+    const patientNameMatch = content.match(/이름:\s*([^,]+)/);
+    const patientName = patientNameMatch ? patientNameMatch[1].trim() : "환자";
 
-      지금부터 아래의 지시사항에 따라서, 답변을 생성합니다.
-      #지시사항(instructions)
-      1. 환자가 불안하지 않도록 친절하게 답변합니다.
-      2. 위험한 항목이 검진되었음에도, 위험성을 낮게 진단해서는 절대 안됩니다. 중복된 내용 중 세부사항은 최대한 포함합니다.
-      3. 함께 제공된 환자정보에서 나이와 수술 부위에 대한 당신의 생각을 덧붙여주세요. 특히, 나이에 따른 회복정도, 주의사항 등을 추가합니다.
-      4. 현재와 수술 날짜까지의 기간을 밝힙니다. 이 때,[한달전, 일주일전, 당일]로 구간을 나눈 후, 해당되는 기간이 있을 경우, 각각의 기간에 주의사항 및 수술을 위해 준비할 사항을 추가합니다.`
-    };
-    
-    // 메시지 포맷
-    const messages = [
-      systemMessage,
-      { role: 'user', content: message.content }
-    ];
-    
-    // OpenAI API 호출
-    const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-    
-    const response = await axios.post(
-      OPENAI_API_ENDPOINT,
-      {
-        model: 'gpt-4o-mini', // 또는 다른 모델
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 1500
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
-        }
+    // Parse diagnosis data from message
+    const diagnosisPattern = /검사 결과:\s*(.*?),\s*오늘 날짜/;
+    const diagnosisMatch = content.match(diagnosisPattern);
+    const diagnosisText = diagnosisMatch ? diagnosisMatch[1] : "";
+
+    // Parse surgery date and current date
+    const surgeryDateMatch = content.match(/수술 날짜:\s*(\S+)/);
+    const surgeryDate = surgeryDateMatch ? surgeryDateMatch[1] : "";
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    // Create diagnosis object from text
+    const diagCategories = ["전안부", "각막", "전방", "수정체", "망막", "시신경"];
+    const diag = {};
+
+    // Initialize categories
+    diagCategories.forEach(category => {
+      diag[category] = [];
+    });
+
+    // Parse diagnosis items
+    const diagItems = diagnosisText.split(', ');
+    diagItems.forEach(item => {
+      const [category, items] = item.split(': ');
+      if (category && items && diagCategories.includes(category)) {
+        diag[category] = items.split(', ');
       }
-    );
-    
-    // 응답 텍스트 반환
-    return response.data.choices[0].message.content;
-    
+    });
+
+    console.log("Parsed diagnosis:", diag);
+
+    // Use personalized_diagnosis algorithm
+    let cat = "";
+    let severe = false;
+    let sentence = "";
+    let detail = [];
+
+    // 최상위(e와 d) : 일반적인 경우와 비교하여 위험요인을 추가로 가지고 있는 상태 + [마지막 문장]
+    if (diag["전방"].length !== 0 || diag["수정체"].length !== 0 || diag["각막"].length !== 0) {
+        severe = true;
+        // e만
+        if (diag["각막"].length === 0) {
+            if (diag["전방"].length === 0) {
+                cat = "수정체";
+            } else if (diag["수정체"].length === 0) {
+                cat = "전방";
+            } else {
+                cat = "전방 및 수정체";
+            }
+
+            detail.push("e");
+            if (diag["수정체"].includes("심한 백내장(백색, 갈색, 후낭하혼탁 포함)")) {
+                detail.push("e_add");
+            }
+        } else {
+            detail.push("e");
+            if (diag["수정체"].includes("심한 백내장(백색, 갈색, 후낭하혼탁 포함)")) {
+                detail.push("e_add");
+            }
+            if (diag["전방"].length !== 0 && diag["수정체"].length !== 0) {
+                cat = "전방 및 수정체 그리고 각막";
+            } else if (diag["수정체"].length === 0) {
+                cat = "전방 그리고 각막";
+            } else if (diag["전방"].length === 0) {
+                cat = "수정체 그리고 각막";
+            } else {
+                cat = "각막";
+                detail = detail.filter(item => item !== "e");
+            }
+            detail.push("d");
+            if (diag["각막"].includes("내피세포 이상 1200개 미만") || diag["각막"].includes("내피세포 이상 1200~1500개")) {
+                detail.push("d_add");
+            }
+        }
+    }
+
+    // 위험도에 따른 첫문장 선택 : (e,d / c,b,a)
+    if (severe) {
+        sentence = `안녕하세요, ${patientName}님.\n\n검진 결과를 바탕으로 환자님의 상태에 대해 설명드리겠습니다.\n\n${patientName}님은 일반적인 경우와 비교하여 ${cat} 관련 위험요인(들)을 추가로 가지고 있는 상태입니다.\n`;
+    } else {
+        sentence = `안녕하세요, ${patientName}님.\n\n검진 결과를 바탕으로 환자님의 상태에 대해 설명드리겠습니다.\n\n${patientName}님은 백내장 수술의 위험성이 낮고, 합병증 발생 가능성이 높지 않은 상태입니다.\n`;
+    }
+
+    let minor_cat = "";
+    if (diag["망막"].length !== 0 || diag["시신경"].length !== 0) {
+        detail.push("c");
+        if (diag["시신경"].length === 0) {
+            minor_cat = "망막";
+        } else if (diag["망막"].length === 0) {
+            minor_cat = "녹내장";
+        } else {
+            minor_cat = "망막 또는 녹내장";
+        }
+    }
+
+    if (diag["전안부"].length !== 0) {
+        detail.push("b");
+    }
+
+    const info = {
+        "e": "백내장 수술의 난이도가 높고, 수술의 범위가 커질 가능성이 있습니다",
+        "e_add": "심한 백내장을 제거하는 과정에서 나타나는 각막부종으로 시력 호전에 제한이 있을 수 있습니다",
+        "d": "백내장 수술 후에도 각막질환으로 인해 시력회복에 제한이 있을 수 있습니다",
+        "d_add": "각막내피세포의 저하로 수술 이후 각막 부종이 나타날 수 있으며, 이로 인한 시력저하가 지속될 시 각막이식술을 고려할 수 있습니다",
+        "c": `백내장 수술 후에도 ${minor_cat} 질환으로 인해 시력 호전에 제한이 있을 수 있습니다`,
+        "b": "수술 후 건성안 증상이 악화될 수 있어 이에 대한 지속적인 관리가 필요합니다"
+    };
+
+    // Format the detail sections with bullet points
+    let detailSection = "";
+    if (detail.length > 0) {
+      detailSection = "\n\n";
+      detail.forEach((idx, i) => {
+        detailSection += `${i+1}. ${info[idx]}.\n`;
+      });
+    }
+
+    sentence += detailSection;
+
+    if (severe) {
+        sentence += '\n저희 세브란스 안과 병원 의료진은 이러한 위험요인(들)을 충분히 숙지하고 준비하겠습니다.';
+    }
+
+    // Add surgery schedule information
+    try {
+      const surgeryDateObj = new Date(surgeryDate);
+      const currentDateObj = new Date(currentDate);
+      const timeDiff = surgeryDateObj - currentDateObj;
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+      sentence += `\n\n현재 날짜는 ${currentDate}이고, 수술 날짜는 ${surgeryDate}로, 약 ${daysDiff}일 남았습니다.`;
+
+      // Add preparation sections based on time left
+      if (daysDiff > 30) {
+        sentence += "\n\n각 기간별 주의사항 및 준비 사항:";
+        sentence += "\n\n한달전: \n- 안과 약과 콘택트렌즈 사용에 대해 의사와 상담하세요\n- 수술 전 건강검진을 받으세요\n- 만성질환(당뇨, 고혈압 등)이 있다면 조절 상태를 확인하세요";
+        sentence += "\n\n일주일전: \n- 수술 전날부터 안약을 처방대로 사용하세요\n- 메이크업을 피하고 안경만 착용하세요\n- 술, 담배를 삼가고 충분한 휴식을 취하세요";
+        sentence += "\n\n당일: \n- 귀중품은 집에 두고 편안한 옷차림으로 오세요\n- 수술 후 귀가를 도와줄 보호자와 함께 내원하세요\n- 식사는 평소대로 하셔도 됩니다";
+      } else if (daysDiff > 7) {
+        sentence += "\n\n각 기간별 주의사항 및 준비 사항:";
+        sentence += "\n\n일주일전: \n- 수술 전날부터 안약을 처방대로 사용하세요\n- 메이크업을 피하고 안경만 착용하세요\n- 술, 담배를 삼가고 충분한 휴식을 취하세요";
+        sentence += "\n\n당일: \n- 귀중품은 집에 두고 편안한 옷차림으로 오세요\n- 수술 후 귀가를 도와줄 보호자와 함께 내원하세요\n- 식사는 평소대로 하셔도 됩니다";
+      } else {
+        sentence += "\n\n당일 주의사항 및 준비 사항: \n- 귀중품은 집에 두고 편안한 옷차림으로 오세요\n- 수술 후 귀가를 도와줄 보호자와 함께 내원하세요\n- 식사는 평소대로 하셔도 됩니다";
+      }
+    } catch (e) {
+      console.error("Error calculating surgery date information:", e);
+    }
+
+    return sentence;
   } catch (error) {
     console.error('Error generating diagnosis:', error);
-    // API 호출 실패 시 대체 응답
-    if (!OPENAI_API_KEY || OPENAI_API_KEY === '') {
-      return '죄송합니다. OpenAI API 키가 설정되지 않았습니다. 환경 설정을 확인해주세요.';
-    }
     return '죄송합니다. 진단을 생성하는 중에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
   }
 };
