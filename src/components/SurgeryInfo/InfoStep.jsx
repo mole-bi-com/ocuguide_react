@@ -124,6 +124,17 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
     setPlayingAudio(null);
     setAudioCompleted(true);
     setHighlightIndex(-1);
+    
+    // Dispatch a custom event to notify the parent component
+    const event = new CustomEvent('audioCompleted', {
+      detail: {
+        stepId: step.id,
+        completed: true,  // This should only be triggered when audio actually completes
+        cardIndex: currentCardIndex,
+        isLastCard: currentCardIndex === step.media.files.length - 1
+      }
+    });
+    window.dispatchEvent(event);
   };
 
   const getAudioUrl = (caption) => {
@@ -265,13 +276,17 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
 
   const handleNextCard = () => {
     if (step.media && step.media.files && currentCardIndex < step.media.files.length - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
+      const nextCardIndex = currentCardIndex + 1;
+      setCurrentCardIndex(nextCardIndex);
       setPlayingAudio(null);
       setAudioCompleted(false);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
+      
+      // Remove the automatic event dispatch here - we only want audio completion
+      // to trigger when the audio actually finishes playing
     }
   };
 
@@ -413,7 +428,9 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
                     </button>
                     {audioCompleted && (
                       <div className="audio-completed-message">
-                        듣기를 완료했습니다. 다음 단계로 진행하실 수 있습니다.
+                        {currentCardIndex === step.media.files.length - 1 
+                          ? "듣기를 완료했습니다. 아래 파란색 다음 단계 버튼을 눌러주세요."
+                          : "듣기를 완료했습니다."}
                       </div>
                     )}
                   </div>
@@ -436,8 +453,8 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
               {showNavigation && (
                 <button
                   onClick={handleNextCard}
-                  disabled={currentCardIndex === step.media.files.length - 1 || (step.media.type === 'audio' && !audioCompleted)}
-                  className={`card-arrow next-arrow ${audioCompleted ? 'completed-arrow' : ''}`}
+                  disabled={currentCardIndex === step.media.files.length - 1 || (step.media.type === 'audio' && !audioCompleted && currentCardIndex < step.media.files.length - 1)}
+                  className={`card-arrow next-arrow ${audioCompleted && currentCardIndex < step.media.files.length - 1 ? 'completed-arrow' : ''}`}
                   aria-label="Next Card"
                 >
                   <span className="material-icons">chevron_right</span>

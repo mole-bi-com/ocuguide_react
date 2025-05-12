@@ -225,28 +225,28 @@
 
 /* Styling for completed arrow button */
 .card-arrow.completed-arrow {
-  background-color: #10b981;
+  background-color: #2563eb;
   animation: pulse-arrow 2s infinite;
 }
 
 .card-arrow.completed-arrow:hover {
-  background-color: #059669;
+  background-color: #1d4ed8;
 }
 
 @keyframes pulse-arrow {
   0% {
     transform: translateY(-50%) scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
   }
   
   70% {
-    transform: translateY(-50%) scale(1.05);
-    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
   }
   
   100% {
     transform: translateY(-50%) scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
   }
 }
 

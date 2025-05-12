@@ -58,6 +58,8 @@ const SurgeryInfoPage = () => {
   const [understandingLevel, setUnderstandingLevel] = useState(0); // Keep state if needed elsewhere, otherwise can remove
   const [showCompletionOptions, setShowCompletionOptions] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0); // Add state for card index
+  const [nextButtonActive, setNextButtonActive] = useState(false);
+  const [completedAudioSteps, setCompletedAudioSteps] = useState({});
 
   // Define initial steps data
   const initialSteps = [
@@ -177,6 +179,64 @@ const SurgeryInfoPage = () => {
   // Calculate completion percentage
   const completionPercentage = Math.round(((progress + 1) / steps.length) * 100);
 
+  // Add a function to check if audio is completed in the current step
+  useEffect(() => {
+    // Check if we already have a completed state for this step
+    if (completedAudioSteps[currentStep]) {
+      setNextButtonActive(true);
+      return;
+    }
+    
+    // Check if the current step has audio content
+    if (steps[currentStep]?.media?.type === 'audio') {
+      // Initially set to inactive for audio steps - will be activated only when audio completes
+      setNextButtonActive(false);
+      
+      // We'll listen for changes in audioCompleted from the InfoStep component
+      const checkAudioCompletion = (event) => {
+        if (event.detail?.stepId === currentStep) {
+          // Only activate the button when audio completes on the last card
+          if (event.detail?.isLastCard && event.detail?.completed) {
+            setNextButtonActive(true);
+            // Store the completed state for this step
+            setCompletedAudioSteps(prev => ({
+              ...prev,
+              [currentStep]: true
+            }));
+          }
+        }
+      };
+      
+      window.addEventListener('audioCompleted', checkAudioCompletion);
+      
+      return () => {
+        window.removeEventListener('audioCompleted', checkAudioCompletion);
+      };
+    } else {
+      // For non-audio steps, the next button can be active immediately
+      setNextButtonActive(true);
+    }
+  }, [currentStep, steps, completedAudioSteps]);
+
+  // Add a new effect to display a message when the next button becomes active
+  useEffect(() => {
+    if (nextButtonActive) {
+      // If we're showing an active next button, we can add any additional UI feedback here
+      // We no longer automatically deactivate the button - it should stay active
+      // once the user has completed the necessary steps
+    }
+  }, [nextButtonActive, showUnderstandingPrompt]);
+
+  // Make sure this effect doesn't auto-activate the button for audio steps
+  useEffect(() => {
+    // This effect now only handles non-audio steps or state synchronization
+    // We should NOT automatically activate just for being on the last card of an audio step
+    if (steps[currentStep]?.media?.type !== 'audio') {
+      // This is a non-audio step, so we can activate the button
+      setNextButtonActive(true);
+    }
+  }, [currentCardIndex, currentStep, steps]);
+
   const handleUnderstandingSelect = async (level) => {
     const endTime = Date.now();
     const duration = (endTime - stepStartTime) / 1000;
@@ -217,9 +277,10 @@ const SurgeryInfoPage = () => {
     }
   };
 
+  // Improve the handleNextStep function to set active state immediately when clicked
   const handleNextStep = () => {
-    // This function should ONLY trigger the next step process (understanding prompt)
     // Card navigation is handled within InfoStep component by arrow buttons
+    setNextButtonActive(true); // Activate button when clicked
     setShowUnderstandingPrompt(true);
   };
 
@@ -334,12 +395,13 @@ const SurgeryInfoPage = () => {
             </button>
             <button
               onClick={handleNextStep}
-              className="nav-button next"
+              className={`nav-button next ${nextButtonActive ? 'active' : ''}`}
               disabled={
-                steps[currentStep].media &&
-                steps[currentStep].media.files &&
-                steps[currentStep].media.files.length > 1 &&
-                currentCardIndex < steps[currentStep].media.files.length - 1
+                // The button should be disabled when:
+                // 1. It's an audio step AND
+                // 2. Either it's not the last card OR the button isn't active yet (audio not completed)
+                steps[currentStep].media?.type === 'audio' && 
+                (!nextButtonActive || currentCardIndex < steps[currentStep].media.files.length - 1)
               }
             >
               {currentStep === steps.length - 1 ? '완료' : '다음 단계'}
