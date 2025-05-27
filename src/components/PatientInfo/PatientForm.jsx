@@ -22,14 +22,6 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
     surgery_eye: '',
     surgery_date: '',
     surgery_time: '',
-    phone: '',
-    email: '',
-    address: '',
-    emergencyContact: '',
-    emergencyPhone: '',
-    medicalHistory: '',
-    allergies: '',
-    medications: '',
     diagnosis: {} // diagnosis 필드 초기화
   });
 
@@ -79,10 +71,6 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
       newErrors.surgery_time = '수술 시간을 선택해주세요';
     }
     
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '올바른 이메일 형식이 아닙니다';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -374,72 +362,6 @@ const PatientForm = ({ onSubmit, setIsLoading }) => {
             />
             {errors.surgery_time && <span className="error-message">{errors.surgery_time}</span>}
           </div>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <h3>연락처 정보</h3>
-        <div className="form-group">
-          <label htmlFor="phone">전화번호</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="010-0000-0000"
-            className={errors.phone ? 'error' : ''}
-          />
-          {errors.phone && <span className="error-message">{errors.phone}</span>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="email">이메일</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={errors.email ? 'error' : ''}
-          />
-          {errors.email && <span className="error-message">{errors.email}</span>}
-        </div>
-      </div>
-
-      <div className="form-section">
-        <h3>의료 정보</h3>
-        <div className="form-group">
-          <label htmlFor="medicalHistory">과거 병력</label>
-          <textarea
-            id="medicalHistory"
-            name="medicalHistory"
-            value={formData.medicalHistory}
-            onChange={handleChange}
-            rows="3"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="allergies">알레르기</label>
-          <textarea
-            id="allergies"
-            name="allergies"
-            value={formData.allergies}
-            onChange={handleChange}
-            rows="2"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="medications">복용 중인 약</label>
-          <textarea
-            id="medications"
-            name="medications"
-            value={formData.medications}
-            onChange={handleChange}
-            rows="2"
-          />
         </div>
       </div>
 

@@ -19,13 +19,49 @@ const StatisticsPage = () => {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const patients = await getPatientStats();
-        const steps = await getStepStats();
-        const understanding = await getUnderstandingStats();
-        const progress = await getPatientProgress();
+        // Test connectivity first
+        console.log('Attempting to fetch statistics...');
         
-        setPatientStats(patients);
-        setStepStats(steps);
+        // Try to fetch each data source individually with error handling
+        let patients = [];
+        let steps = [];
+        let understanding = [];
+        let progress = [];
+        
+        try {
+          patients = await getPatientStats();
+          console.log('Patient stats fetched successfully:', patients?.length || 0, 'patients');
+        } catch (patientError) {
+          console.error('Error fetching patient stats:', patientError);
+          patients = [];
+        }
+        
+        try {
+          steps = await getStepStats();
+          console.log('Step stats fetched successfully:', steps?.length || 0, 'steps');
+        } catch (stepError) {
+          console.error('Error fetching step stats:', stepError);
+          steps = [];
+        }
+        
+        try {
+          understanding = await getUnderstandingStats();
+          console.log('Understanding stats fetched successfully:', understanding?.length || 0, 'records');
+        } catch (understandingError) {
+          console.error('Error fetching understanding stats:', understandingError);
+          understanding = [];
+        }
+        
+        try {
+          progress = await getPatientProgress();
+          console.log('Patient progress fetched successfully:', progress?.length || 0, 'records');
+        } catch (progressError) {
+          console.error('Error fetching patient progress:', progressError);
+          progress = [];
+        }
+        
+        setPatientStats(patients || []);
+        setStepStats(steps || []);
         setUnderstandingStats(understanding || []);
         setPatientProgress(progress || []);
         
@@ -33,9 +69,17 @@ const StatisticsPage = () => {
         if (patients && patients.length > 0) {
           setCurrentPatient(patients[0]);
         }
+        
+        // Only show error if ALL requests failed
+        if (!patients.length && !steps.length && !understanding.length && !progress.length) {
+          setError('데이터베이스에 연결할 수 없습니다. 네트워크 연결을 확인하고 다시 시도해주세요.');
+        } else {
+          setError(null); // Clear any previous errors
+        }
+        
       } catch (err) {
         console.error('Error fetching statistics:', err);
-        setError('통계 데이터를 불러오는 중 오류가 발생했습니다.');
+        setError('통계 데이터를 불러오는 중 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.');
       } finally {
         setLoading(false);
       }
@@ -186,6 +230,78 @@ const StatisticsPage = () => {
       )
     : [];
 
+  // Load demo data function
+  const loadDemoData = () => {
+    const demoPatients = [
+      {
+        patient_number: "DEMO001",
+        patient_name: "김영희",
+        gender: "여성",
+        age: 65,
+        birth_date: "1959-03-15",
+        primary_doctor: "이안과",
+        surgery_eye: "우안",
+        surgery_date: "2024-12-15",
+        surgery_time: "14:00",
+        created_at: "2024-05-20"
+      },
+      {
+        patient_number: "DEMO002", 
+        patient_name: "박철수",
+        gender: "남성",
+        age: 72,
+        birth_date: "1952-08-22",
+        primary_doctor: "김안과",
+        surgery_eye: "좌안",
+        surgery_date: "2024-12-20",
+        surgery_time: "10:30",
+        created_at: "2024-05-21"
+      }
+    ];
+
+    const demoSteps = [
+      {
+        step_id: 0,
+        step_name: "정보 개요",
+        duration_seconds: 120,
+        session_id: "demo_session_1"
+      },
+      {
+        step_id: 1,
+        step_name: "백내장의 정의, 수술 과정",
+        duration_seconds: 180,
+        session_id: "demo_session_1"
+      }
+    ];
+
+    const demoProgress = [
+      {
+        patient_number: "DEMO001",
+        completed_steps: 3,
+        total_steps: 6,
+        completion_rate: 50,
+        current_step: "3단계 진행 중",
+        is_completed: false
+      },
+      {
+        patient_number: "DEMO002",
+        completed_steps: 6,
+        total_steps: 6,
+        completion_rate: 100,
+        current_step: "모든 단계 완료",
+        is_completed: true
+      }
+    ];
+
+    setPatientStats(demoPatients);
+    setStepStats(demoSteps);
+    setUnderstandingStats([]);
+    setPatientProgress(demoProgress);
+    setCurrentPatient(demoPatients[0]);
+    setError(null);
+    setLoading(false);
+  };
+
   return (
     <div className="statistics-page">
       <h1 className="page-title">✨ OcuGUIDE 사용내역</h1>
@@ -193,7 +309,49 @@ const StatisticsPage = () => {
       {loading ? (
         <div className="loading-message">통계 데이터를 불러오는 중입니다...</div>
       ) : error ? (
-        <div className="error-message">{error}</div>
+        <div className="error-container">
+          <div className="error-message">
+            <div className="error-icon">⚠️</div>
+            <div className="error-text">
+              <h3>데이터 로딩 오류</h3>
+              <p>{error}</p>
+            </div>
+            <button 
+              className="retry-button" 
+              onClick={() => window.location.reload()}
+            >
+              🔄 새로고침
+            </button>
+          </div>
+          
+          {/* Show fallback content */}
+          <div className="fallback-content">
+            <h2>🔧 대안 옵션</h2>
+            <div className="fallback-options">
+              <div className="fallback-option">
+                <h3>📊 데모 데이터 보기</h3>
+                <p>샘플 통계 데이터로 시스템 기능을 확인할 수 있습니다.</p>
+                <button 
+                  className="demo-button"
+                  onClick={() => loadDemoData()}
+                >
+                  데모 데이터 로드
+                </button>
+              </div>
+              
+              <div className="fallback-option">
+                <h3>🏠 홈으로 돌아가기</h3>
+                <p>환자 정보 페이지로 돌아가서 다시 시작할 수 있습니다.</p>
+                <button 
+                  className="home-button"
+                  onClick={() => window.location.href = '/'}
+                >
+                  홈으로 이동
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div className="stats-section">

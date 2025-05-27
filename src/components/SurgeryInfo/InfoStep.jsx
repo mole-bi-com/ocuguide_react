@@ -5,6 +5,7 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
   const [playingAudio, setPlayingAudio] = useState(null);
   const [audioCompleted, setAudioCompleted] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [showArrowInstruction, setShowArrowInstruction] = useState(false);
   const audioRef = useRef(null);
   const textRef = useRef(null);
   const textContentRef = useRef(null);
@@ -125,6 +126,15 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
     setAudioCompleted(true);
     setHighlightIndex(-1);
     
+    // Show arrow instruction if there are more cards to navigate
+    if (currentCardIndex < step.media.files.length - 1) {
+      setShowArrowInstruction(true);
+      // Auto-hide the instruction after 4 seconds
+      setTimeout(() => {
+        setShowArrowInstruction(false);
+      }, 4000);
+    }
+    
     // Dispatch a custom event to notify the parent component
     const event = new CustomEvent('audioCompleted', {
       detail: {
@@ -222,16 +232,20 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
 근거리 작업이 많은 경우 근거리가 잘 보이도록 하는 것도 가능합니다.
 최근에는 이러한 단점을 보완한 새로운 인공수정체들이 사용되고 있습니다.`,
 
-      '다초점 인공수정체 (Multifocal)': `다초점 인공수정체는 원거리와 근거리(30cm) 모두 잘 보이도록 고안된 인공수정체입니다.
-주로 노안 교정시에 많이 사용되나 빛번짐 등의 부작용이 있을 수 있습니다.
-녹내장이나 황반변성 등 시신경이나 망막 이상이 있는 환자에는 권장되지 않습니다.`,
+      '다초점 인공수정체 (Multifocal)': `다초점 인공수정체는 원거리와 근거리(30cm) 모두를 선명하게 볼 수 있도록 설계된 첨단 인공수정체입니다.
+이 렌즈는 여러 초점을 갖고 있어 독서나 컴퓨터 작업 등 근거리 시야와 운전이나 TV 시청 등 원거리 시야를 모두 개선합니다.
+주로 노안 교정에 효과적이나, 야간 빛번짐이나 후광 현상 등의 부작용이 있을 수 있습니다.
+녹내장이나 황반변성 등 시신경이나 망막에 이상이 있는 환자에게는 권장되지 않습니다.`,
 
-      '강화 단초점 인공수정체': `강화 단초점 인공수정체는 단초점 인공수정체보다 중간거리(50cm)가 잘 보이도록 만들어진 인공수정체입니다.
-다초점 인공수정체보다 부작용이 적으나, 근거리에서 안경 착용이 필요할 수 있습니다.`,
+      '강화 단초점 인공수정체': `강화 단초점 인공수정체는 기존 단초점 렌즈보다 중간거리(50cm)에서의 시야를 크게 개선한 차세대 렌즈입니다.
+이 렌즈는 컴퓨터나 스마트폰 사용 시 더 편안한 시야를 제공하며, 일상생활에서 안경 의존도를 줄여줍니다.
+다초점 인공수정체에 비해 부작용이 현저히 적으며, 야간 시야 장애나 빛번짐이 거의 없습니다.
+다만 정밀한 근거리 작업 시에는 여전히 돋보기나 근거리용 안경이 필요할 수 있습니다.`,
 
-      '난시교정렌즈 (Toric)와 최종 결정': `난시가 심한 경우 난시교정렌즈를 고려할 수 있습니다.
-수술 후에는 인공수정체의 교체가 어렵기 때문에, 개개인의 연령 및 눈 상태에 따라 알맞은 인공수정체를 결정하는 것이 중요합니다.
-인공수정체 결정은 주치의선생님의 설명을 충분히 들은후에 결정하시기 바랍니다.`,
+      '난시교정렌즈 (Toric)와 최종 결정': `난시교정렌즈(Toric)는 기존의 난시를 동시에 교정할 수 있는 특수 설계된 인공수정체입니다.
+이 렌즈는 백내장과 난시를 한 번의 수술로 모두 해결할 수 있어, 수술 후 더욱 선명하고 깨끗한 시야를 제공합니다.
+수술 후 인공수정체의 교체는 매우 어려우며 위험을 동반하므로, 환자의 연령, 생활 패턴, 눈의 상태를 종합적으로 고려한 신중한 선택이 필요합니다.
+반드시 주치의와 충분한 상담을 통해 개인에게 가장 적합한 인공수정체를 결정하시기 바랍니다.`,
 
       // 수술 후 시력, 일상생활 관련 텍스트
       '백내장 수술 후에는 언제부터 잘 보이게 되나요?': `수술 직후나 다음날부터 잘 보이는 경우도 있으나 각막 부종 등으로 오히려 일시적으로 시력이 떨어질 수도 있습니다. 일반적으로 1~2주간의 회복기를 거치며 서서히 시력이 호전됩니다. 수술 후 1~2달 정도 뒤에 최종적으로 정확한 시력 및 도수를 알 수 있습니다. 안경이 필요할 경우 이 시기에 처방을 받으시면 됩니다. 망막질환, 녹내장 등 기저 안질환이 동반되어 있는 경우에는 시력 회복이 제한될 수 있습니다.`,
@@ -458,6 +472,14 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
                   aria-label="Next Card"
                 >
                   <span className="material-icons">chevron_right</span>
+                  {audioCompleted && currentCardIndex < step.media.files.length - 1 && (
+                    <>
+                      <div className="arrow-popup-message">
+                        다음으로 →
+                      </div>
+                      <div className="arrow-breathing-dot"></div>
+                    </>
+                  )}
                 </button>
               )}
             </div>
@@ -496,6 +518,17 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
         <p className="step-description">{step.content}</p>
       </div>
       {renderMedia()}
+      
+      {/* Arrow instruction overlay */}
+      {showArrowInstruction && (
+        <div className="arrow-instruction-overlay" onClick={() => setShowArrowInstruction(false)}>
+          <div className="arrow-instruction-content">
+            <h3>듣기 완료!</h3>
+            <p>오른쪽 화살표를 클릭하여<br/>다음 내용으로 이동하세요</p>
+            <div className="arrow-demo">→</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

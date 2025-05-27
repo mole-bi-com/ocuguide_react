@@ -181,8 +181,8 @@ const SurgeryInfoPage = () => {
 
   // Add a function to check if audio is completed in the current step
   useEffect(() => {
-    // Check if we already have a completed state for this step
-    if (completedAudioSteps[currentStep]) {
+    // Check if we already have a completed state for this step or if it's a previously completed step
+    if (completedAudioSteps[currentStep] || currentStep <= progress) {
       setNextButtonActive(true);
       return;
     }
@@ -216,7 +216,7 @@ const SurgeryInfoPage = () => {
       // For non-audio steps, the next button can be active immediately
       setNextButtonActive(true);
     }
-  }, [currentStep, steps, completedAudioSteps]);
+  }, [currentStep, steps, completedAudioSteps, progress]);
 
   // Add a new effect to display a message when the next button becomes active
   useEffect(() => {
@@ -300,18 +300,22 @@ const SurgeryInfoPage = () => {
         <h3>이 단계의 내용을 얼마나 이해하셨나요?</h3>
         <p>선택한 단계에서 환자의 이해도를 알려주세요</p>
         <div className="understanding-levels">
-          {[1, 2, 3, 4].map(level => (
+          {[1, 2, 3].map(level => (
             <button
               key={level}
               className="understanding-level-btn"
               onClick={() => handleUnderstandingSelect(level)}
             >
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px' }}>{level}단계</span>
+              <span style={{ fontSize: level === 3 ? '5.5rem' : '4.5rem', fontWeight: 'bold', marginBottom: '8px' }}>
+                {level === 1 ? '✗' :
+                 level === 2 ? '△' :
+                 '⬤'}
+              </span>
+              <span style={{ fontSize: '1.4rem', fontWeight: 'bold', marginBottom: '8px' }}>{level}단계</span>
               <span>
                 {level === 1 ? '이해하지 못했음' :
                  level === 2 ? '약간 이해했음' :
-                 level === 3 ? '대체로 이해했음' :
-                 '완전히 이해했음'}
+                 '이해했음'}
               </span>
             </button>
           ))}
@@ -346,10 +350,11 @@ const SurgeryInfoPage = () => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={`step-item ${index === currentStep && !showCompletionOptions ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'}`}
+            className={`step-item ${index === currentStep && !showCompletionOptions ? 'active' : ''} ${index <= progress ? 'completed' : 'incomplete'} ${index <= progress ? 'clickable' : ''}`}
             onClick={() => {
               if (index <= progress) { // Allow clicking on completed steps to navigate back
                 setCurrentStep(index);
+                setCurrentCardIndex(0); // Reset card index when navigating to a specific step
                 setShowCompletionOptions(false); // Hide completion options when navigating to a specific step
               }
             }}

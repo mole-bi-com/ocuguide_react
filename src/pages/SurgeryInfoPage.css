@@ -94,6 +94,20 @@
   font-weight: 600;
 }
 
+/* Clickable completed steps */
+.step-item.clickable {
+  cursor: pointer;
+}
+
+.step-item.clickable:hover .step-number {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(74, 222, 128, 0.4);
+}
+
+.step-item.clickable:hover .step-title {
+  color: #166534;
+}
+
 .step-completion-icon {
   font-size: 1.3rem;
 }
@@ -195,12 +209,13 @@
 }
 
 .nav-button.next.active {
-  animation: pulse-next-button 3s infinite;
-  background-color: #2563eb;
+  animation: pulse-next-button 2s infinite;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
   position: relative;
   overflow: hidden;
+  border: 2px solid #60a5fa;
 }
 
 .nav-button.next.active:after {
@@ -212,12 +227,18 @@
   top: 0;
   left: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-position: 50%;
-  transform: scale(10, 10);
-  opacity: 0;
-  transition: transform .5s, opacity 1s;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: shimmer-next 3s infinite;
+}
+
+.nav-button.next.active::before {
+  content: "✨";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: sparkle 1.5s infinite;
 }
 
 .nav-button.next.active:active:after {
@@ -229,17 +250,39 @@
 @keyframes pulse-next-button {
   0% {
     transform: translateY(-2px) scale(1);
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3), 0 0 0 0 rgba(37, 99, 235, 0.7);
   }
   
   50% {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 0 0 8px rgba(37, 99, 235, 0);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4), 0 0 0 10px rgba(37, 99, 235, 0.1);
   }
   
   100% {
     transform: translateY(-2px) scale(1);
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3), 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+@keyframes shimmer-next {
+  0% {
+    transform: translateX(-100%);
+  }
+  
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: translateY(-50%) scale(0.8);
+  }
+  
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
   }
 }
 
@@ -376,7 +419,7 @@
 }
 
 .understanding-prompt h3 {
-  font-size: 1.75rem;
+  font-size: 2.2rem;
   margin-bottom: 0.75rem;
   color: #1e3a8a;
   font-weight: 700;
@@ -385,7 +428,7 @@
 .understanding-prompt p {
   color: #64748b;
   margin-bottom: 2rem;
-  font-size: 1.05rem;
+  font-size: 1.3rem;
 }
 
 .understanding-levels {
@@ -397,15 +440,15 @@
 
 .understanding-level-btn {
   flex: 1;
-  padding: 1.25rem 0.75rem;
+  padding: 1.5rem 1rem;
   border: none;
   border-radius: 12px;
   background-color: #f8fafc;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.3rem;
   transition: all 0.25s ease;
   line-height: 1.5;
-  min-width: 120px;
+  min-width: 140px;
   font-weight: 600;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   display: flex;
