@@ -150,10 +150,10 @@ const InfoStep = ({ step, patientInfo, currentCardIndex, setCurrentCardIndex }) 
   const getAudioUrl = (caption) => {
     const audioMap = {
       // 백내장 개요 관련 오디오
-      '백내장이란 무엇인가요?': '/contents/q1_1.mp3',
-      '백내장 수술은 어떻게 진행되나요?': '/contents/q1_2.mp3',
-      '백내장 수술시간은 어느정도 되나요?': '/contents/q1_3.mp3',
-      '백내장 수술 시 마취는 어떠한 방식으로 하나요?': '/contents/q1_4.mp3',
+      '백내장이란 무엇인가요?': '/assets/audio/kim 1-1.wav',
+      '백내장 수술은 어떻게 진행되나요?': '/assets/audio/kim 1-2.wav',
+      '백내장 수술시간은 어느정도 되나요?': '/assets/audio/kim 1-3.wav',
+      '백내장 수술 시 마취는 어떠한 방식으로 하나요?': '/assets/audio/kim 1-4.wav',
       
       // 인공수정체 결정 관련 오디오
       '인공수정체 기본 원리': '/contents/iol_1.mp3',
